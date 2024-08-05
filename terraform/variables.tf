@@ -22,14 +22,6 @@ variable "s3_bucket_name" {
   description = "S3 bicket for vector db."
 }
 
-variable "s3_folder_name" {
-  description = "S3 folder for vector db."
-}
-
-variable "db_file_name" {
-  description = "Vector DB file."
-}
-
 variable "my_ip" {
   description = "The CIDR allowed to access the instance."
   default     = "89.247.166.183/32"  # Replace with your actual IP address

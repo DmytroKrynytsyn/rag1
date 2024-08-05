@@ -102,7 +102,7 @@ resource "aws_instance" "vector_db" {
   }
 
   tags = {
-    Name = "rag1"
+    Name = "vectordb"
     Purpose = "dkedu"
     Role = "vector_db"
   }
@@ -121,7 +121,7 @@ resource "aws_instance" "rag_service" {
   }
 
   tags = {
-    Name = "rag1"
+    Name = "rag"
     Purpose = "dkedu"
     Role = "rag_service"
   }
