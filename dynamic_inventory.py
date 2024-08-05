@@ -19,13 +19,18 @@ def get_ec2_by_tag(tag_key, tag_value):
 
     return instances
 
+
+def get_public_ip_by_role(role: str) -> str:
+    return get_ec2_by_tag("Role", role)[0]['PublicIpAddress']
+
+
 def main():
     inventory = {
-        'backend': {
-            'hosts': get_ec2_by_tag('Role', 'vector_db')
+        'vector_db': {
+            'hosts': [get_public_ip_by_role('vector_db')], 'vars': { 'ansible_user': 'ubuntu','ansible_ssh_private_key_file': './cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
         },
-        'service': {
-            'hosts': get_ec2_by_tag('Role', 'rag_service')
+        'rag_service': {
+            'hosts': [get_public_ip_by_role('rag_service')], 'vars': { 'ansible_user': 'ubuntu','ansible_ssh_private_key_file': './cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
         },
         '_meta': {
             'hostvars': {}
@@ -33,6 +38,8 @@ def main():
     }
     
     print(json.dumps(inventory, indent=2))
+    #print(json.dumps(inventory))
+    #print(inventory)
 
 if __name__ == '__main__':
     main()
