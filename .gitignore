@@ -1,0 +1,10 @@
+format.json
+.env
+venv
+.venv
+__pycache__
+poetry.lock
+dist/
+.terragrunt-cache/
+.terraform.lock.hcl
+.DS_Store
