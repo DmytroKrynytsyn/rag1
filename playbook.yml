@@ -6,13 +6,16 @@
     s3_bucket_name: "dkedu"
     s3_folder_name: "rag1"  # Prefix in the S3 bucket where the files are located
     local_db_files_location: "/volumes/milvus"
+    milvus_script_location: "/usr/local/bin"
+    milvus_script_url: "https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh"
+  
   tasks:
 
     - name: Ensure the local directory exists
       file:
         path: "{{ local_db_files_location }}"
         state: directory
-        mode: '0755'
+        mode: '0777'
 
     - name: Initial update apt cache
       apt:
@@ -58,6 +61,12 @@
           - docker-compose-plugin
         state: present
 
+    - name: Download standalone_embed.sh milvus script
+      get_url:
+        url: "{{ milvus_script_url }}"
+        dest: "{{ milvus_script_location }}/standalone_embed.sh"
+        mode: '0755'
+
     - name: Create the download-on-startup systemd service file from template
       template:
         src: download-on-startup.service.j2
@@ -84,3 +93,32 @@
         name: upload-on-shutdown.service
         enabled: yes
         state: started
+
+- name: Configure RAG host
+  hosts: rag_service
+  become: yes
+  vars:
+    s3_bucket_name: "dkedu"
+    
+  tasks:
+    - name: Ensure software-properties-common is installed
+      apt:
+        name: software-properties-common
+        state: present
+
+    - name: Add deadsnakes PPA
+      apt_repository:
+        repo: ppa:deadsnakes/ppa
+        state: present
+
+    - name: Update apt package index
+      apt:
+        update_cache: yes
+
+    - name: Install Python 3.12
+      apt:
+        name:
+          - python3.12
+          - python3.12-venv
+          - python3.12-dev
+        state: present

@@ -1,10 +1,10 @@
 [Unit]
-Description=Download directory from S3 on startup
+Description=Download directory from S3 on startup and start milvus
 After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c 'aws s3 sync s3://{{ s3_bucket_name }}/{{ s3_folder_name }} {{ local_db_files_location }}'
+ExecStart=/bin/bash -c 'aws s3 sync s3://{{ s3_bucket_name }}/{{ s3_folder_name }} {{ local_db_files_location }} && {{ milvus_script_location }}/standalone_embed.sh start'
 TimeoutSec=0
 RemainAfterExit=true
 

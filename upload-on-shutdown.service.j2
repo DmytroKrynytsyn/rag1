@@ -1,5 +1,5 @@
 [Unit]
-Description=Upload directory to S3 on shutdown
+Description=Stop Milvus and upload directory to S3 on shutdown
 DefaultDependencies=no
 Before=shutdown.target reboot.target halt.target
 Requires=network-online.target network.target
@@ -8,7 +8,7 @@ Requires=network-online.target network.target
 Type=oneshot
 KillMode=none
 ExecStart=/bin/true
-ExecStop=/bin/bash -c 'aws s3 sync {{ local_db_files_location }} s3://{{ s3_bucket_name }}/{{ s3_folder_name }}'
+ExecStop=/bin/bash -c '/bin/bash {{ milvus_script_location }}/standalone_embed.sh stop || aws s3 sync {{ local_db_files_location }} s3://{{ s3_bucket_name }}/{{ s3_folder_name }}'
 TimeoutSec=0
 RemainAfterExit=true
 
