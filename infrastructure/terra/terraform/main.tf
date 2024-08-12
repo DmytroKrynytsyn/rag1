@@ -66,9 +66,10 @@ resource "aws_security_group" "web_sg" {
 
   ingress {
     description = "HTTP"
-    from_port   = 80
-    to_port     = 80
+    from_port   = 19530
+    to_port     = 19530
     protocol    = "tcp"
+    self        = true
     cidr_blocks = [var.my_ip]
   }
 
@@ -89,8 +90,6 @@ resource "aws_instance" "vector_db" {
   ami           = var.ami_id
   instance_type = var.instance_type
   security_groups = [aws_security_group.web_sg.name]
-
-  instance_initiated_shutdown_behavior = "terminate"
 
   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
 
@@ -119,6 +118,11 @@ resource "aws_instance" "rag_service" {
     volume_type = "gp2"
     volume_size = var.root_volume_size
   }
+
+  user_data = <<-EOF
+              #!/bin/bash
+              echo "${aws_instance.vector_db.private_ip} vector_db.local" >> /etc/hosts
+              EOF
 
   tags = {
     Name = "rag"
