@@ -1,17 +1,13 @@
 [tool.poetry]
-name = "rag1"
+name = "rag1frontend"
 version = "0.1.0"
 description = ""
 authors = ["DmytroKrynytsyn <dmitry.krinitsyn@gmail.com>"]
 readme = "README.md"
-packages = [{include = "rag1", from = "src"}]
-
-[tool.poetry.scripts]
-rag1 = "rag1.main:main"
+packages = [{include = "rag1frontend", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-python-dotenv = "^1.0.1"
 
 
 [build-system]
