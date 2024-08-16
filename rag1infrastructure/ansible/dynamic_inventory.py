@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 load_dotenv('../.env')
 
 open_api_key = os.getenv("OPEN_API_KEY")
+slack_bot_token = os.getenv("SLACK_BOT_TOKEN")
+slack_app_token = os.getenv("SLACK_APP_TOKEN")
+default_channel = os.getenv("DEFAULT_CHANNEL")
 
 def get_ec2_by_tag(tag_key, tag_value):
     ec2_client = boto3.client('ec2')
@@ -42,7 +45,13 @@ def main():
         },
         'rag_backend': {
             'hosts': [get_public_ip_by_role('rag_backend')], 
-            'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no', 'open_api_key':open_api_key, 'vector_db_ip': get_private_ip_by_role('vector_db')}
+            'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no', 
+                     'open_api_key':open_api_key, 'vector_db_ip': get_private_ip_by_role('vector_db')}
+        },
+        'rag_frontend': {
+            'hosts': [get_public_ip_by_role('rag_frontend')], 
+            'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no', 
+                     'slack_bot_token': slack_bot_token, 'slack_app_token': slack_app_token, 'default_channel': default_channel, 'rag_backend_ip': get_private_ip_by_role('rag_backend')}
         }
     }
 

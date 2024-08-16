@@ -65,6 +65,14 @@ resource "aws_security_group" "web_sg" {
   }
 
   ingress {
+    description = "SSH"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip]
+  }
+
+  ingress {
     description = "HTTP"
     from_port   = 19530
     to_port     = 19530
@@ -119,14 +127,28 @@ resource "aws_instance" "rag_backend" {
     volume_size = var.root_volume_size
   }
 
-  user_data = <<-EOF
-              #!/bin/bash
-              echo "${aws_instance.vector_db.private_ip} vector_db.local" >> /etc/hosts
-              EOF
-
   tags = {
     Name = "rag"
     Purpose = "dkedu"
     Role = "rag_backend"
+  }
+}
+
+resource "aws_instance" "rag_frontend" {
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  security_groups = [aws_security_group.web_sg.name]
+
+  key_name = "cks"
+
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = var.root_volume_size
+  }
+
+  tags = {
+    Name = "rag"
+    Purpose = "dkedu"
+    Role = "rag_frontend"
   }
 }

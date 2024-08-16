@@ -3,6 +3,9 @@ from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from dotenv import load_dotenv
 
+from ..handlers.call_backend import search, embed
+from ..utils.slack import get_channel_name_by_id
+
 load_dotenv()
 
 def main():
@@ -19,12 +22,24 @@ def main():
     @app.event("message")
     def handle_message_events(body, say):
         event = body.get("event", {})
-        text = event.get("text", "")
-        channel = event.get("channel")
+        text: str = event.get("text", "")
+        channel_id = event.get("channel")
         
-        if channel == DEFAULT_CHANNEL and "hello" in text.lower():
+        if channel_id == DEFAULT_CHANNEL and "hello" in text.lower():
             user = event.get("user")
             say(f"Hello, <@{user}>!")
+            return
+        
+        channel_name = get_channel_name_by_id(channel_id)
+
+        if text.lower().startswith("search:"):
+            say(search(text.lower(), channel_name))
+
+        if text.lower().startswith("embed:"):
+            say(embed(text.lower(), channel_name))
+
+        say(f"Try - searh: ... OR embed: ...")
+
 
     handler = SocketModeHandler(app, SLACK_APP_TOKEN)
 

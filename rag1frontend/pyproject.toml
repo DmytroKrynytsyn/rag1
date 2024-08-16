@@ -12,7 +12,7 @@ slack-bolt = "^1.19.1"
 python-dotenv = "^1.0.1"
 
 [tool.poetry.scripts]
-slack_bot = "rag1frontend.entrypoint.main:main"
+rag1frontend = "rag1frontend.entrypoint.main:main"
 
 [build-system]
 requires = ["poetry-core"]

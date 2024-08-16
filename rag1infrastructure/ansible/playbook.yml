@@ -99,3 +99,24 @@
         env:
           VECTOR_DN_DNS_NAME: "{{ hostvars[inventory_hostname]['vector_db_ip'] }}"
           OPEN_API_KEY: "{{ hostvars[inventory_hostname]['open_api_key'] }}"
+
+- name: Configure RAG frontend service
+  hosts: rag_frontend
+  become: yes
+
+  tasks:
+    - name: Pull Docker image
+      community.docker.docker_image:
+        name: dkrinitsyn/rag1frontend
+        tag: latest
+        source: pull
+
+    - name: Run Docker container
+      community.docker.docker_container:
+        name: rag1frontend_container
+        image: dkrinitsyn/rag1frontend:latest
+        state: started
+        env:
+          SLACK_BOT_TOKEN: "{{ hostvars[inventory_hostname]['slack_bot_token'] }}"
+          SLACK_APP_TOKEN: "{{ hostvars[inventory_hostname]['slack_app_token'] }}"
+          DEFAULT_CHANNEL: "{{ hostvars[inventory_hostname]['default_channel'] }}"

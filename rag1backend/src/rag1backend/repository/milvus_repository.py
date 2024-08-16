@@ -8,6 +8,7 @@ vector_db = os.getenv("VECTOR_DN_DNS_NAME")
 class MilvusRepository:
     def __init__(self):
         connections.connect("default", host=vector_db, port="19530")
+        print(f'Connected to {vector_db} vector db')
 
     def _get_or_create_collection(self, collection_name: str) -> Collection:
         if collection_name in Collection.list():
