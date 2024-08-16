@@ -1,28 +1,25 @@
 from pymilvus import Collection, CollectionSchema, FieldSchema, DataType, connections
-from rag1backend.repository.repository import VectorRepository
 
 from typing import List
 import os
 
 vector_db = os.getenv("VECTOR_DN_DNS_NAME")
 
-class MilvusRepository(VectorRepository):
-    def __init__(self, collection_name):
+class MilvusRepository:
+    def __init__(self):
         connections.connect("default", host=vector_db, port="19530")
-        self.collection_name = collection_name
-        self.collection = self._get_or_create_collection()
 
-    def _get_or_create_collection(self) -> Collection:
-        if self.collection_name in Collection.list():
-            return Collection(self.collection_name)
+    def _get_or_create_collection(self, collection_name: str) -> Collection:
+        if collection_name in Collection.list():
+            return Collection(collection_name)
         
         fields = [
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
             FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=768),
             FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=65535)
         ]
-        schema = CollectionSchema(fields, description=f"{self.collection_name} collection")
-        collection = Collection(self.collection_name, schema)
+        schema = CollectionSchema(fields, description=f"{collection_name} collection")
+        collection = Collection(collection_name, schema)
         
         index_params = {
             "index_type": "IVF_FLAT",
@@ -32,16 +29,21 @@ class MilvusRepository(VectorRepository):
         collection.create_index(field_name="embedding", index_params=index_params)
         return collection
 
-    def insert_text(self, embedding: List[float], text: str) -> None:
+    def insert_text(self, embedding: List[float], text: str, collection_name: str) -> None:
+
+        collection = self._get_or_create_collection(collection_name)
+
         data = [
             [embedding],
             [text]
         ]
-        self.collection.insert(data)
+        collection.insert(data)
 
-    def search_text(self, embedding: List[float], limit: int = 5):
+    def search_text(self, embedding: List[float], collection_name: str, limit: int = 5):
+        collection = self._get_or_create_collection(collection_name)
+
         search_params = {"metric_type": "COSINE", "params": {"nprobe": 10}}
-        results = self.collection.search(
+        results = collection.search(
             data=[embedding],
             anns_field="embedding",
             param=search_params,

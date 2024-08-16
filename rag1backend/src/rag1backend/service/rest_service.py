@@ -1,12 +1,14 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from rag1backend.model.embed_request import EmbedRequest
 from rag1backend.model.search_request import SearchRequest
-from rag1backend.repository.repository import VectorRepository
-from ..repository.repository import get_repository
+
 import openai
 import os
 
+from rag1backend.repository.milvus_repository import MilvusRepository
+
 router = APIRouter()
+repository: MilvusRepository = MilvusRepository()
 
 openai.api_key = os.getenv("OPEN_API_KEY")
 
@@ -20,15 +22,14 @@ def get_embedding(text: str):
 
 @router.post("/embed/")
 async def embed_text(
-    request: EmbedRequest, 
-    repository: VectorRepository = Depends(get_repository)):
+    request: EmbedRequest):
 
     print("EmbedRequest: ", request.text)
 
     try:
         embedding = get_embedding(request.text)
 
-        repository.insert_text(embedding, request.text)
+        repository.insert_text(embedding, request.text, request.collection_name)
         return {"status": "success", "message": "Text embedded and stored successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -36,14 +37,13 @@ async def embed_text(
 @router.post("/search/")
 async def search_text(
     request: SearchRequest, 
-    repository: VectorRepository = Depends(get_repository),
     limit: int = 5):
 
     print("SearchRequest: ", request.text)
 
     try:
         query_embedding = get_embedding(request.text)
-        results = repository.search_text(query_embedding, limit)
+        results = repository.search_text(query_embedding, request.collection_name, limit)
         
         matches = [
             {"id": result.id, "distance": result.distance, "text": result.entity.get("text")}
