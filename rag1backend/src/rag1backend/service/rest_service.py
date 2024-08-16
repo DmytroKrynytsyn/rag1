@@ -21,8 +21,10 @@ def get_embedding(text: str):
 @router.post("/embed/")
 async def embed_text(
     request: EmbedRequest, 
-    repository: VectorRepository = Depends(get_repository)
-):
+    repository: VectorRepository = Depends(get_repository)):
+
+    print("EmbedRequest: ", request.text)
+
     try:
         embedding = get_embedding(request.text)
 
@@ -35,8 +37,10 @@ async def embed_text(
 async def search_text(
     request: SearchRequest, 
     repository: VectorRepository = Depends(get_repository),
-    limit: int = 5
-):
+    limit: int = 5):
+
+    print("SearchRequest: ", request.text)
+
     try:
         query_embedding = get_embedding(request.text)
         results = repository.search_text(query_embedding, limit)
