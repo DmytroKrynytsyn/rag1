@@ -1,6 +1,6 @@
 import uvicorn
 
-from ..service import router
+from ..service.rest_service import router
 
 def main():
     uvicorn.run(router, host="0.0.0.0", port=8000)

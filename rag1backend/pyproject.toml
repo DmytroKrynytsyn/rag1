@@ -14,7 +14,7 @@ pymilvus = "^2.4.5"
 openai = "^1.40.6"
 
 [tool.poetry.scripts]
-slack_bot = "rag1backend.entrypoint.main:main"
+rag1backend = "rag1backend.entrypoint.main:main"
 
 
 [build-system]
