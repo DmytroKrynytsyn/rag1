@@ -27,10 +27,12 @@ def get_public_ip_by_role(role: str) -> str:
 def main():
     inventory = {
         'vector_db': {
-            'hosts': [get_public_ip_by_role('vector_db')], 'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
+            'hosts': [get_public_ip_by_role('vector_db')], 
+            'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
         },
-        'rag_service': {
-            'hosts': [get_public_ip_by_role('rag_service')], 'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
+        'rag_backend': {
+            'hosts': [get_public_ip_by_role('rag_backend')], 
+            'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
         },
         '_meta': {
             'hostvars': {}
@@ -38,8 +40,6 @@ def main():
     }
     
     print(json.dumps(inventory, indent=2))
-    #print(json.dumps(inventory))
-    #print(inventory)
 
 if __name__ == '__main__':
     main()

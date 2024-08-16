@@ -1,6 +1,6 @@
 from pymilvus import Collection, CollectionSchema, FieldSchema, DataType, connections
 from rag1backend.repository.repository import VectorRepository
-from app.schemas.text import TextRequest
+
 from typing import List
 import os
 

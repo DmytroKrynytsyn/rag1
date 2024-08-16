@@ -1,22 +1,9 @@
 ---
-- name: Configure Vector DB EC2 instance to sync directories with S3 on startup and shutdown
-  hosts: vector_db
+- name: Docker for all
+  hosts: all
   become: yes
-  vars:
-    s3_bucket_name: "dkedu"
-    s3_folder_name: "rag1"  # Prefix in the S3 bucket where the files are located
-    local_db_files_location: "/volumes/milvus"
-    milvus_script_location: "/usr/local/bin"
-    milvus_script_url: "https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh"
-  
+
   tasks:
-
-    - name: Ensure the local directory exists
-      file:
-        path: "{{ local_db_files_location }}"
-        state: directory
-        mode: '0777'
-
     - name: Initial update yum cache
       yum:
         update_cache: yes
@@ -38,6 +25,25 @@
         name: docker
         state: started
         enabled: yes
+
+---
+- name: Configure Vector DB EC2 instance to sync directories with S3 on startup and shutdown
+  hosts: vector_db
+  become: yes
+  vars:
+    s3_bucket_name: "dkedu"
+    s3_folder_name: "rag1"
+    local_db_files_location: "/volumes/milvus"
+    milvus_script_location: "/usr/local/bin"
+    milvus_script_url: "https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh"
+  
+  tasks:
+
+    - name: Ensure the local directory exists
+      file:
+        path: "{{ local_db_files_location }}"
+        state: directory
+        mode: '0777'
 
     - name: Download standalone_embed.sh milvus script
       get_url:
@@ -73,21 +79,24 @@
         enabled: yes
         state: started
 
-- name: Configure RAG host
-  hosts: rag_service
+- name: Configure RAG backend service
+  hosts: rag_backend
   become: yes
 
   tasks:
-    - name: Install Python 3.11
-      yum:
-        name: python3.11
-        state: present
 
-    - name: Ensure pip is installed for Python 3.11
-      shell: |
-        python3.11 -m ensurepip --upgrade
+   - name: Pull Docker image
+      community.docker.docker_image:
+        name: dkrinitsyn/rag1backend
+        tag: latest
+        source: pull
 
-    - name: Install pymilvus using pip
-      pip:
-        name: pymilvus
-        executable: pip3.11
+    - name: Run Docker container
+      community.docker.docker_container:
+        name: rag1backend_container
+        image: dkrinitsyn/rag1backend:latest
+        state: started
+        ports:
+          - "8000:80"
+        environment:
+          VECTOR_DN_DNS_NAME: "{{ hostvars['vector_db']['ansible_host'] }}"

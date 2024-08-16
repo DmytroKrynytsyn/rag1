@@ -107,7 +107,7 @@ resource "aws_instance" "vector_db" {
   }
 }
 
-resource "aws_instance" "rag_service" {
+resource "aws_instance" "rag_backend" {
   ami           = var.ami_id
   instance_type = var.instance_type
   security_groups = [aws_security_group.web_sg.name]
@@ -127,6 +127,6 @@ resource "aws_instance" "rag_service" {
   tags = {
     Name = "rag"
     Purpose = "dkedu"
-    Role = "rag_service"
+    Role = "rag_backend"
   }
 }
