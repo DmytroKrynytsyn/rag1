@@ -97,7 +97,7 @@
         ports:
           - "8000:80"
         env:
-          VECTOR_DN_DNS_NAME: "{{ hostvars[inventory_hostname]['vector_db_ip'] }}"
+          VECTOR_DB_IP: "{{ hostvars[inventory_hostname]['vector_db_ip'] }}"
           OPEN_API_KEY: "{{ hostvars[inventory_hostname]['open_api_key'] }}"
 
 - name: Configure RAG frontend service
@@ -120,3 +120,4 @@
           SLACK_BOT_TOKEN: "{{ hostvars[inventory_hostname]['slack_bot_token'] }}"
           SLACK_APP_TOKEN: "{{ hostvars[inventory_hostname]['slack_app_token'] }}"
           DEFAULT_CHANNEL: "{{ hostvars[inventory_hostname]['default_channel'] }}"
+          RAG_BACKEND_IP: "{{ hostvars[inventory_hostname]['rag_backend_ip'] }}"

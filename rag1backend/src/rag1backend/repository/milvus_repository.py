@@ -3,12 +3,12 @@ from pymilvus import Collection, CollectionSchema, FieldSchema, DataType, connec
 from typing import List
 import os
 
-vector_db = os.getenv("VECTOR_DN_DNS_NAME")
+vector_db_ip = os.getenv("VECTOR_DB_IP")
 
 class MilvusRepository:
     def __init__(self):
-        connections.connect("default", host=vector_db, port="19530")
-        print(f'Connected to {vector_db} vector db')
+        connections.connect("default", host=vector_db_ip, port="19530")
+        print(f'Connected to {vector_db_ip} vector db')
 
     def _get_or_create_collection(self, collection_name: str) -> Collection:
         if collection_name in Collection.list():
