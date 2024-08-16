@@ -4,10 +4,11 @@ from rag1backend.model.search_request import SearchRequest
 from rag1backend.repository.repository import VectorRepository
 from ..repository.repository import get_repository
 import openai
+import os
 
 router = APIRouter()
 
-openai.api_key = 'your-openai-api-key'
+openai.api_key = os.getenv("OPEN_API_KEY")
 
 def get_embedding(text: str):
     response = openai.Embedding.create(

@@ -26,7 +26,6 @@
         state: started
         enabled: yes
 
----
 - name: Configure Vector DB EC2 instance to sync directories with S3 on startup and shutdown
   hosts: vector_db
   become: yes
@@ -84,8 +83,7 @@
   become: yes
 
   tasks:
-
-   - name: Pull Docker image
+    - name: Pull Docker image
       community.docker.docker_image:
         name: dkrinitsyn/rag1backend
         tag: latest
@@ -98,5 +96,6 @@
         state: started
         ports:
           - "8000:80"
-        environment:
-          VECTOR_DN_DNS_NAME: "{{ hostvars['vector_db']['ansible_host'] }}"
+        env:
+          VECTOR_DN_DNS_NAME: "{{ hostvars[inventory_hostname]['vector_db_ip'] }}"
+          OPEN_API_KEY: "{{ hostvars[inventory_hostname]['open_api_key'] }}"

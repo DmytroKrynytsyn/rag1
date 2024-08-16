@@ -24,5 +24,5 @@ variable "s3_bucket_name" {
 
 variable "my_ip" {
   description = "The CIDR allowed to access the instance."
-  default     = "188.10.253.122/32"  # Replace with your actual IP address
+  default     = "89.247.166.182/32"  # Replace with your actual IP address
 }
