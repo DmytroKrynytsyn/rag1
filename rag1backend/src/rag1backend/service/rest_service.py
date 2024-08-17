@@ -23,7 +23,7 @@ def get_embedding(text: str):
     return embedding
 
 @router.post("/embed/")
-async def embed_text(
+def embed_text(
     request: EmbedRequest):
 
     print(f"EmbedRequest, text{request.text[:10]}, collection {request.collection_name}")
@@ -37,7 +37,7 @@ async def embed_text(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/search/")
-async def search_text(
+def search_text(
     request: SearchRequest, 
     limit: int = 5):
 
