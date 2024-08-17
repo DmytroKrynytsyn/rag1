@@ -1,4 +1,4 @@
-from pymilvus import Collection, CollectionSchema, FieldSchema, DataType, connections
+from pymilvus import Collection, CollectionSchema, FieldSchema, DataType, connections, utility
 
 from typing import List
 import os
@@ -11,22 +11,29 @@ class MilvusRepository:
         print(f'Connected to {vector_db_ip} vector db')
 
     def _get_or_create_collection(self, collection_name: str) -> Collection:
-        if collection_name in Collection.list():
+        # Use utility.list_collections() to check if the collection already exists
+        if collection_name in utility.list_collections():
             return Collection(collection_name)
         
+        # Define the schema for the new collection
         fields = [
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
             FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=768),
             FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=65535)
         ]
-        schema = CollectionSchema(fields, description=f"{collection_name} collection")
-        collection = Collection(collection_name, schema)
         
+        schema = CollectionSchema(fields, description=f"{collection_name} collection")
+        
+        # Create a new collection with the specified schema
+        collection = Collection(name=collection_name, schema=schema)
+        
+        # Create an index on the 'embedding' field
         index_params = {
             "index_type": "IVF_FLAT",
             "metric_type": "COSINE",
             "params": {"nlist": 128}
         }
+        
         collection.create_index(field_name="embedding", index_params=index_params)
         
         print(f"Collection {collection_name} created")
