@@ -39,7 +39,7 @@ def embed(text: str, channel_name: str) -> str:
             )
 
         if response.status_code == 200:
-            return response.json() 
+            return response.json() + "Ok"
         else:
             return f'Error calling embed backend {response.status_code} {response.text}'
 
