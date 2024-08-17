@@ -16,8 +16,6 @@ def search(question: str, channel_name: str) -> str:
                 }
             )
 
-        print(f"Response on search: {response}")
-
         if response.status_code == 200:
             return str(response.json())
         else:
@@ -39,8 +37,6 @@ def embed(text: str, channel_name: str) -> str:
                     "collection_name": channel_name
                 }
             )
-
-        print(f"Response on embed: {response}")
 
         if response.status_code == 200:
             return str(response.json())

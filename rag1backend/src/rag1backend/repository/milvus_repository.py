@@ -11,11 +11,9 @@ class MilvusRepository:
         print(f'Connected to {vector_db_ip} vector db')
 
     def _get_or_create_collection(self, collection_name: str) -> Collection:
-        # Use utility.list_collections() to check if the collection already exists
         if collection_name in utility.list_collections():
             return Collection(collection_name)
-        
-        # Define the schema for the new collection
+
         fields = [
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
             FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=1536),
@@ -24,10 +22,8 @@ class MilvusRepository:
         
         schema = CollectionSchema(fields, description=f"{collection_name} collection")
         
-        # Create a new collection with the specified schema
         collection = Collection(name=collection_name, schema=schema)
         
-        # Create an index on the 'embedding' field
         index_params = {
             "index_type": "IVF_FLAT",
             "metric_type": "COSINE",
@@ -44,13 +40,8 @@ class MilvusRepository:
 
         collection = self._get_or_create_collection(collection_name)
 
-        data = [
-            [embedding],
-            [text]
-        ]
-
         collection.insert([
-            [None, embedding, text]  # None for auto-generated ID, embedding, and the text
+            [None, embedding, text]
         ])
 
         collection.flush()
