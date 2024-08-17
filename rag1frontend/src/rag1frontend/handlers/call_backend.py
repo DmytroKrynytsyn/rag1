@@ -19,7 +19,7 @@ def search(question: str, channel_name: str) -> str:
         print(f"Response on search: {response}")
 
         if response.status_code == 200:
-            return response.json() + "Ok"
+            return str(response.json())
         else:
             return f'Error calling search backend {response.status_code} {response.text}'
 
@@ -43,7 +43,7 @@ def embed(text: str, channel_name: str) -> str:
         print(f"Response on embed: {response}")
 
         if response.status_code == 200:
-            return response.json() + "Ok"
+            return str(response.json())
         else:
             return f'Error calling embed backend {response.status_code} {response.text}'
 
