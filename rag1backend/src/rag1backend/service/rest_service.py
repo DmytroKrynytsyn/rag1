@@ -7,7 +7,7 @@ import os
 
 from rag1backend.repository.milvus_repository import MilvusRepository
 
-router = APIRouter()
+router = APIRouter(redirect_slashes=False)
 repository: MilvusRepository = MilvusRepository()
 
 openai.api_key = os.getenv("OPEN_API_KEY")

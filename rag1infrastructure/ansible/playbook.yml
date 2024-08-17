@@ -88,7 +88,7 @@
         name: dkrinitsyn/rag1backend:latest
         tag: latest
         source: pull
-        pull: true
+        force_source: true
 
     - name: Run Docker container
       community.docker.docker_container:
@@ -111,7 +111,7 @@
         name: dkrinitsyn/rag1frontend
         tag: latest
         source: pull
-        pull: true
+        force_source: true
 
     - name: Run Docker container
       community.docker.docker_container:

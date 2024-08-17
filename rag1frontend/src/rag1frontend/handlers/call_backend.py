@@ -5,7 +5,7 @@ rag_backend_ip = os.getenv("RAG_BACKEND_IP")
 
 def search(question: str, channel_name: str) -> str:
     try:
-        rag_backend_url = f"http://{rag_backend_ip}/search"
+        rag_backend_url = f"http://{rag_backend_ip}/search/"
 
         with httpx.Client() as client:
             response = client.post(
@@ -14,6 +14,7 @@ def search(question: str, channel_name: str) -> str:
                     "text": question,
                     "collection_name": channel_name
                 },
+                allow_redirects=True
             )
 
         if response.status_code == 200:
@@ -27,7 +28,7 @@ def search(question: str, channel_name: str) -> str:
 
 def embed(text: str, channel_name: str) -> str:
     try:
-        rag_backend_url = f"http://{rag_backend_ip}/embed"
+        rag_backend_url = f"http://{rag_backend_ip}/embed/"
 
         with httpx.Client() as client:
             response = client.post(
@@ -36,6 +37,7 @@ def embed(text: str, channel_name: str) -> str:
                     "text": text,
                     "collection_name": channel_name
                 },
+                allow_redirects=True
             )
 
         if response.status_code == 200:
