@@ -50,7 +50,7 @@ class MilvusRepository:
         ]
         collection.insert(data)
 
-        utility.flush([collection_name])
+        collection.flush()
 
     def search_text(self, embedding: List[float], collection_name: str, limit: int = 5):
         collection = self._get_or_create_collection(collection_name)
