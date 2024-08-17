@@ -16,6 +16,8 @@ def main():
 
     def send_hello_message():
         app.client.chat_postMessage(channel=DEFAULT_CHANNEL, text="Hello, RAG!")
+        app.client.chat_postMessage(channel="C07J0GW6E3S", text="Hello, RAG!")
+
 
     app = App(token=SLACK_BOT_TOKEN)
 
@@ -24,13 +26,15 @@ def main():
         event = body.get("event", {})
         text: str = event.get("text", "")
         channel_id = event.get("channel")
+
+        print(f"handling {text} from {channel_id}/{get_channel_name_by_id(channel_id, app)}")
         
         if channel_id == DEFAULT_CHANNEL and "hello" in text.lower():
             user = event.get("user")
             say(f"Hello, <@{user}>!")
             return
         
-        channel_name = get_channel_name_by_id(channel_id)
+        channel_name = get_channel_name_by_id(channel_id, app)
 
         if text.lower().startswith("search:"):
             say(search(text.lower(), channel_name))

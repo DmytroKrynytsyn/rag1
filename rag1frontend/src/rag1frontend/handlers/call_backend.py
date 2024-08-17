@@ -7,7 +7,7 @@ def search(question: str, channel_name: str) -> str:
     try:
         rag_backend_url = f"http://{rag_backend_ip}/api/search"
 
-        with httpx.AsyncClient() as client:
+        with httpx.Client() as client:
             response = client.post(
                 rag_backend_url,
                 json={
@@ -29,7 +29,7 @@ def embed(text: str, channel_name: str) -> str:
     try:
         rag_backend_url = f"http://{rag_backend_ip}/api/embed"
 
-        with httpx.AsyncClient() as client:
+        with httpx.Client() as client:
             response = client.post(
                 rag_backend_url,
                 json={
