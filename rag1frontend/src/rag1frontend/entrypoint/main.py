@@ -8,6 +8,9 @@ from ..utils.slack import get_channel_name_by_id
 
 load_dotenv()
 
+SEARCH_PREFIX = "search:"
+EMBED_PREFIX = "embed:"
+
 def main():
     
     SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
@@ -16,8 +19,6 @@ def main():
 
     def send_hello_message():
         app.client.chat_postMessage(channel=DEFAULT_CHANNEL, text="Hello, RAG!")
-        app.client.chat_postMessage(channel="C07J0GW6E3S", text="Hello, RAG!")
-
 
     app = App(token=SLACK_BOT_TOKEN)
 
@@ -36,11 +37,11 @@ def main():
         
         channel_name = get_channel_name_by_id(channel_id, app)
 
-        if text.lower().startswith("search:"):
-            say(search(text.lower(), channel_name))
+        if text.lower().startswith(SEARCH_PREFIX):
+            say(search(text.lower()[len(SEARCH_PREFIX):], channel_name))
 
-        if text.lower().startswith("embed:"):
-            say(embed(text.lower(), channel_name))
+        if text.lower().startswith(EMBED_PREFIX):
+            say(embed(text.lower()[len(EMBED_PREFIX):], channel_name))
 
         say(f"Try - searh: ... OR embed: ...")
 

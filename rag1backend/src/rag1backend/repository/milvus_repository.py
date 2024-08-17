@@ -28,6 +28,9 @@ class MilvusRepository:
             "params": {"nlist": 128}
         }
         collection.create_index(field_name="embedding", index_params=index_params)
+        
+        print(f"Collection {collection_name} created")
+        
         return collection
 
     def insert_text(self, embedding: List[float], text: str, collection_name: str) -> None:

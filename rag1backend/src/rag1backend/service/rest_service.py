@@ -24,7 +24,7 @@ def get_embedding(text: str):
 async def embed_text(
     request: EmbedRequest):
 
-    print("EmbedRequest: ", request.text)
+    print(f"EmbedRequest, text{request.text[:10]}, collection {request.collection_name}")
 
     try:
         embedding = get_embedding(request.text)
@@ -39,7 +39,7 @@ async def search_text(
     request: SearchRequest, 
     limit: int = 5):
 
-    print("SearchRequest: ", request.text)
+    print(f"SearchRequest, text{request.text[:10]}, collection {request.collection_name}")
 
     try:
         query_embedding = get_embedding(request.text)
