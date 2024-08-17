@@ -1,6 +1,6 @@
 from slack_bolt import App
 
-def get_channel_name_by_id(channel_id: str, app: App):
+def get_channel_name_by_id(channel_id: str, app: App) -> str:
     try:
         # Call conversations.info to get the channel info
         result = app.client.conversations_info(channel=channel_id)

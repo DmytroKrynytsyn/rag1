@@ -10,6 +10,7 @@ packages = [{include = "rag1frontend", from = "src"}]
 python = "^3.12"
 slack-bolt = "^1.19.1"
 python-dotenv = "^1.0.1"
+httpx = "^0.27.0"
 
 [tool.poetry.scripts]
 rag1frontend = "rag1frontend.entrypoint.main:main"
