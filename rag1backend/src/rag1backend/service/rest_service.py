@@ -13,7 +13,8 @@ repository: MilvusRepository = MilvusRepository()
 openai.api_key = os.getenv("OPEN_API_KEY")
 
 def get_embedding(text: str):
-    response = openai.Embedding.create(
+    # Use the new `openai.embeddings.create` method
+    response = openai.embeddings.create(
         input=text,
         model="text-embedding-ada-002"
     )
