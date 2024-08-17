@@ -48,7 +48,10 @@ class MilvusRepository:
             [embedding],
             [text]
         ]
-        collection.insert(data)
+
+        collection.insert([
+            [None, embedding, text]  # None for auto-generated ID, embedding, and the text
+        ])
 
         collection.flush()
 
@@ -63,6 +66,6 @@ class MilvusRepository:
             anns_field="embedding",
             param=search_params,
             limit=limit,
-            expr=None
+            output_fields=["text"]
         )
         return results
