@@ -31,6 +31,7 @@ async def embed_text(
     try:
         embedding = get_embedding(request.text)
         repository.insert_text(embedding, request.text, request.collection_name)
+
         return {"status": "success", "message": "Text embedded and stored successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

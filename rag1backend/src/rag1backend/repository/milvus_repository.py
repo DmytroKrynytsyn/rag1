@@ -50,8 +50,12 @@ class MilvusRepository:
         ]
         collection.insert(data)
 
+        utility.flush([collection_name])
+
     def search_text(self, embedding: List[float], collection_name: str, limit: int = 5):
         collection = self._get_or_create_collection(collection_name)
+
+        collection.load()
 
         search_params = {"metric_type": "COSINE", "params": {"nprobe": 10}}
         results = collection.search(
