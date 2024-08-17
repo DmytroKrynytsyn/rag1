@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException
 from rag1backend.model.embed_request import EmbedRequest
 from rag1backend.model.search_request import SearchRequest
 
@@ -18,7 +18,8 @@ def get_embedding(text: str):
         input=text,
         model="text-embedding-ada-002"
     )
-    embedding = response['data'][0]['embedding']
+    # Access the embedding data using dot notation
+    embedding = response.data[0].embedding
     return embedding
 
 @router.post("/embed/")
@@ -29,7 +30,6 @@ async def embed_text(
 
     try:
         embedding = get_embedding(request.text)
-
         repository.insert_text(embedding, request.text, request.collection_name)
         return {"status": "success", "message": "Text embedded and stored successfully"}
     except Exception as e:
