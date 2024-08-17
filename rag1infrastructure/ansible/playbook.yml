@@ -95,7 +95,7 @@
         image: dkrinitsyn/rag1backend:latest
         state: started
         ports:
-          - "8000:80"
+          - "80:80"
         env:
           VECTOR_DB_IP: "{{ hostvars[inventory_hostname]['vector_db_ip'] }}"
           OPEN_API_KEY: "{{ hostvars[inventory_hostname]['open_api_key'] }}"
