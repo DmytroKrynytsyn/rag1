@@ -13,8 +13,7 @@ def search(question: str, channel_name: str) -> str:
                 json={
                     "text": question,
                     "collection_name": channel_name
-                },
-                allow_redirects=True
+                }
             )
 
         if response.status_code == 200:
@@ -36,8 +35,7 @@ def embed(text: str, channel_name: str) -> str:
                 json={
                     "text": text,
                     "collection_name": channel_name
-                },
-                allow_redirects=True
+                }
             )
 
         if response.status_code == 200:
