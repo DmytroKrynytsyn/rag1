@@ -85,9 +85,10 @@
   tasks:
     - name: Pull Docker image
       community.docker.docker_image:
-        name: dkrinitsyn/rag1backend
+        name: dkrinitsyn/rag1backend:latest
         tag: latest
         source: pull
+        pull: true
 
     - name: Run Docker container
       community.docker.docker_container:
@@ -110,6 +111,7 @@
         name: dkrinitsyn/rag1frontend
         tag: latest
         source: pull
+        pull: true
 
     - name: Run Docker container
       community.docker.docker_container:

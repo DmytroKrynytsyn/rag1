@@ -65,10 +65,11 @@ resource "aws_security_group" "web_sg" {
   }
 
   ingress {
-    description = "SSH"
+    description = "HTTP"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
+    self        = true
     cidr_blocks = [var.my_ip]
   }
 
