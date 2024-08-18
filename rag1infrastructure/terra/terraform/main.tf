@@ -129,7 +129,7 @@ resource "aws_instance" "rag_backend" {
   }
 
   tags = {
-    Name = "rag"
+    Name = "rag_backend"
     Purpose = "dkedu"
     Role = "rag_backend"
   }
@@ -148,7 +148,7 @@ resource "aws_instance" "rag_frontend" {
   }
 
   tags = {
-    Name = "rag"
+    Name = "rag_frontend"
     Purpose = "dkedu"
     Role = "rag_frontend"
   }
