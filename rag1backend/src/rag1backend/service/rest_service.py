@@ -75,7 +75,7 @@ def search_text(request: SearchRequest, limit: int = 5):
         
         # Correctly extract matches and distances
         matches = [
-            {"id": result.id, "distance": result.distances[0], "text": result.entity.get("text")}
+            {"id": result.id, "distance": result.distance, "text": result.entity.get("text")}
             for result in results[0]
         ]
 
