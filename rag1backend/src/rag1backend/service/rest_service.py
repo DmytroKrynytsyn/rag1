@@ -79,7 +79,7 @@ def search_text(request: SearchRequest, limit: int = 5):
             for result in results[0]
         ]
 
-        prompt = prepare_openai_prompt(matches)  # Pass the actual results to the prompt preparation function
+        prompt = prepare_openai_prompt(matches, request.question)  # Pass the actual results to the prompt preparation function
         
         response = openai.Completion.create(
             engine="text-davinci-003",
