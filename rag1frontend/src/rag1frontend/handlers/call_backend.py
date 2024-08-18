@@ -25,7 +25,7 @@ def search(question: str, channel_name: str) -> str:
         return f'Exception calling search backend {str(exc)}'
 
 
-def embed(text: str, channel_name: str) -> str:
+def embed(text: str, user_name: str, datetime: int, channel_name: str) -> str:
     try:
         rag_backend_url = f"http://{rag_backend_ip}/embed/"
 
@@ -34,6 +34,8 @@ def embed(text: str, channel_name: str) -> str:
                 rag_backend_url,
                 json={
                     "text": text,
+                    "user_name": user_name, 
+                    "datetime": datetime,
                     "collection_name": channel_name
                 }
             )

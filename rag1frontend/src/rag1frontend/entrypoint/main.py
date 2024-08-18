@@ -27,6 +27,7 @@ def main():
         event = body.get("event", {})
         text: str = event.get("text", "")
         channel_id = event.get("channel")
+        timestamp = int(float(event.get("ts")))
 
         print(f"handling {text} from {channel_id}/{get_channel_name_by_id(channel_id, app)}")
         
@@ -41,7 +42,7 @@ def main():
             say(search(text.lower()[len(SEARCH_PREFIX):], channel_name))
 
         if text.lower().startswith(EMBED_PREFIX):
-            say(embed(text.lower()[len(EMBED_PREFIX):], channel_name))
+            say(embed(text.lower()[len(EMBED_PREFIX):], user, timestamp, channel_name))
 
         say(f"Try - searh: ... OR embed: ...")
 

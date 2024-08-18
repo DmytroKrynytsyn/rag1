@@ -12,6 +12,7 @@ uvicorn = "^0.30.6"
 fastapi = "^0.112.0"
 pymilvus = "^2.4.5"
 openai = "^1.40.6"
+langchain = "^0.2.14"
 
 [tool.poetry.scripts]
 rag1backend = "rag1backend.entrypoint.main:main"

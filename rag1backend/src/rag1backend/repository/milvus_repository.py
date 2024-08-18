@@ -17,7 +17,9 @@ class MilvusRepository:
         fields = [
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
             FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=1536),
-            FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=65535)
+            FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=65535),
+            FieldSchema(name="user_name", dtype=DataType.VARCHAR, max_length=255),
+            FieldSchema(name="datetime", dtype=DataType.INT64)
         ]
         
         schema = CollectionSchema(fields, description=f"{collection_name} collection")
@@ -36,12 +38,12 @@ class MilvusRepository:
         
         return collection
 
-    def insert_text(self, embedding: List[float], text: str, collection_name: str) -> None:
+    def insert_text(self, embedding: List[float], text: str, user_name: str, timestamp: int, collection_name: str) -> None:
 
         collection = self._get_or_create_collection(collection_name)
 
         collection.insert([
-            [None, embedding, text]
+            [None, embedding, text, user_name, timestamp]
         ])
 
         collection.flush()
@@ -57,6 +59,6 @@ class MilvusRepository:
             anns_field="embedding",
             param=search_params,
             limit=limit,
-            output_fields=["text"]
+            output_fields=["text", "user_name", "datetime"]
         )
         return results
