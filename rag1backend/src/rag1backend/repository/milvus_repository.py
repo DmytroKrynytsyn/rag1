@@ -38,12 +38,12 @@ class MilvusRepository:
         
         return collection
 
-    def insert_text(self, embedding: List[float], text: str, user_name: str, timestamp: int, collection_name: str) -> None:
+    def insert_text(self, embedding: List[float], text: str, user_name: str, datetime: int, collection_name: str) -> None:
 
         collection = self._get_or_create_collection(collection_name)
 
         collection.insert([
-            [None, embedding, text, user_name, timestamp]
+            [None, embedding, text, user_name, datetime]
         ])
 
         collection.flush()

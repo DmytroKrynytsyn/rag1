@@ -56,7 +56,7 @@ def embed_text(request: EmbedRequest):
         chunks = [chunk.strip() for chunk in chunks if chunk.strip()]
         for chunk in chunks:
             embedding = get_embedding(chunk)
-            repository.insert_text(embedding, chunk, request.user_name, request.timestamp, request.collection_name)
+            repository.insert_text(embedding, chunk, request.user_name, request.datetime, request.collection_name)
 
         return {"status": "success", "message": f"Text embedded, {len(chunks)} chunks"}
     except Exception as e:

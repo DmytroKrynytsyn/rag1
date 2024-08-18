@@ -48,7 +48,7 @@ def main():
         event = body.get("event", {})
         text: str = event.get("text", "")
         channel_id = event.get("channel")
-        timestamp = int(float(event.get("ts")))
+        datetime = int(float(event.get("ts")))
         channel_name = get_channel_name_by_id(channel_id, app)
         user = event.get("user")
 
@@ -68,10 +68,10 @@ def main():
 
         if text.lower().startswith(EMBED_PREFIX):
             text_to_embed = text.lower()[len(EMBED_PREFIX):] + get_attached_test(event.get("files", []), SLACK_BOT_TOKEN)
-            say(embed(text_to_embed, user, timestamp, channel_name))
+            say(embed(text_to_embed, user, datetime, channel_name))
             return
 
-        say(f"Try - searh: ... OR embed: ...")
+        say(f"T`ry - searh: ... OR embed: ...")
 
 
     handler = SocketModeHandler(app, SLACK_APP_TOKEN)
