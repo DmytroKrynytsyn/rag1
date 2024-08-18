@@ -8,8 +8,6 @@ from typing import List
 import openai
 import os
 
-from openai import OpenAI
-client = OpenAI()
 
 from rag1backend.repository.milvus_repository import MilvusRepository
 
@@ -82,7 +80,7 @@ def search_text(request: SearchRequest, limit: int = 5):
 
         prompt = prepare_openai_prompt(matches, request.question)
 
-        response = client.chat.completions.create(
+        response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
