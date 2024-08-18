@@ -1,6 +1,7 @@
 # LLM RAG - Milvus and Slack.
 
-![rag1](https://github.com/user-attachments/assets/c0a46d4a-5478-4d4a-b60c-bb20a77737be)
+![rag1 (1)](https://github.com/user-attachments/assets/258828ca-d904-4026-b7c2-ceb5482b93bb)
+
 
 ## Tech stack:
 1. Cloud - AWS, Docker, terrafrom/terragrunt
