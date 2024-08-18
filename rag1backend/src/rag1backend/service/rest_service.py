@@ -21,7 +21,7 @@ def prepare_openai_prompt(results: List[dict], question: str) -> str:
     
     prompt = f"Please summarize the following answers, in one answer on question '{question}', as a text of 3-5 sentences long:\n\n"
     for idx, match in enumerate(top_matches):
-        prompt += f"Match {idx + 1}:\nText: {match.text}\n\n"
+        prompt += f"Match {idx + 1}:\nText: {match['text']}\n\n"
     
     return prompt
 
