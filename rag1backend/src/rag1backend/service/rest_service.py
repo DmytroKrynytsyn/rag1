@@ -16,10 +16,9 @@ repository: MilvusRepository = MilvusRepository()
 openai.api_key = os.getenv("OPEN_API_KEY")
 
 def prepare_openai_prompt(results: List[dict], question: str) -> str:
-    # Sort the results based on the distance
-    top_matches = sorted(results, key=lambda x: x.distance)[:3]
+
+    top_matches = sorted(results, key=lambda x: x['distance'])[:3]
     
-    # Prepare the prompt text based on the top matches
     prompt = f"Please summarize the following answers, in one answer on question '{question}', as a text of 3-5 sentences long:\n\n"
     for idx, match in enumerate(top_matches):
         prompt += f"Match {idx + 1}:\nText: {match.text}\n\n"
@@ -73,7 +72,6 @@ def search_text(request: SearchRequest, limit: int = 5):
 
         print(f"results = {str(results)}")
         
-        # Correctly extract matches and distances
         matches = [
             {"id": result.id, "distance": result.distance, "text": result.entity.get("text")}
             for result in results[0]
