@@ -53,7 +53,7 @@ def embed_text(request: EmbedRequest):
 
     try:
         chunks = semantic_chunker(request.text, chunk_size=1000, overlap_ratio=0.2)
-        for chunk in chunks:
+        for chunk in chunks if chunk.strip():
             embedding = get_embedding(chunk)
             repository.insert_text(embedding, chunk, request.user_name, request.timestamp, request.collection_name)
 

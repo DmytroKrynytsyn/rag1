@@ -67,7 +67,7 @@ def main():
             return
 
         if text.lower().startswith(EMBED_PREFIX):
-            text_to_embed = text.lower()[len(EMBED_PREFIX):] + get_attached_test(event.get("files", []), app.token)
+            text_to_embed = text.lower()[len(EMBED_PREFIX):] + get_attached_test(event.get("files", []), SLACK_BOT_TOKEN)
             say(embed(text_to_embed, user, timestamp, channel_name))
             return
 
