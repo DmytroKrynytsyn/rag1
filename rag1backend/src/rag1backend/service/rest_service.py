@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter, HTTPException
 from rag1backend.model.embed_request import EmbedRequest
 from rag1backend.model.search_request import SearchRequest
@@ -14,13 +15,14 @@ repository: MilvusRepository = MilvusRepository()
 
 openai.api_key = os.getenv("OPEN_API_KEY")
 
-def prepare_openai_prompt(results: List[dict]) -> str:
-    # Access the distances correctly
-    top_matches = sorted(results, key=lambda x: x.distances[0])[:3]
+def prepare_openai_prompt(results: List[dict], question: str) -> str:
+    # Sort the results based on the distance
+    top_matches = sorted(results, key=lambda x: x['distance'])[:3]
     
-    prompt = "Please summarize the following information into 3-5 sentences:\n\n"
+    # Prepare the prompt text based on the top matches
+    prompt = f"Please summarize the following answers, in one answer on question '{question}', as a text of 3-5 sentences long:\n\n"
     for idx, match in enumerate(top_matches):
-        prompt += f"Match {idx + 1}:\nText: {match.entity.get('text', 'N/A')}\n\n"
+        prompt += f"Match {idx + 1}:\nText: {match['entity'].get('text', 'N/A')}\n\n"
     
     return prompt
 
@@ -69,15 +71,16 @@ def search_text(request: SearchRequest, limit: int = 5):
         query_embedding = get_embedding(request.question)
         results = repository.search_text(query_embedding, request.collection_name, limit)
 
-        print(f"results = {str(results)}")
-        
+        # Deserialize the results from JSON-like strings
+        deserialized_results = [json.loads(result) for result in results]
+
         # Correctly extract matches and distances
         matches = [
-            {"id": result.id, "distance": result.distances[0], "text": result.entity.get("text")}
-            for result in results[0]
+            {"id": match['id'], "distance": match['distance'], "text": match['entity'].get('text')}
+            for match in deserialized_results
         ]
 
-        prompt = prepare_openai_prompt(results[0])  # Pass the actual results to the prompt preparation function
+        prompt = prepare_openai_prompt(matches)  # Pass the actual matches to the prompt preparation function
 
         response = openai.Completion.create(
             engine="text-davinci-003",
