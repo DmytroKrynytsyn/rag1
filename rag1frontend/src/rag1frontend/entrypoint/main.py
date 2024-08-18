@@ -50,11 +50,11 @@ def main():
         channel_id = event.get("channel")
         timestamp = int(float(event.get("ts")))
         channel_name = get_channel_name_by_id(channel_id, app)
+        user = event.get("user")
 
-        print(f"handling {text} from {channel_id}/{channel_name}")
+        print(f"handling {text} from {user} in {channel_id}/{channel_name}")
         
         if channel_id == DEFAULT_CHANNEL and "hello" in text.lower():
-            user = event.get("user")
             say(f"Hello, <@{user}>!")
             return
         
