@@ -42,9 +42,13 @@ class MilvusRepository:
 
         collection = self._get_or_create_collection(collection_name)
 
-        collection.insert([
-            [None, embedding, text, user_name, datetime]
-        ])
+        ids = [None] 
+        embeddings = [embedding]
+        texts = [text]
+        user_names = [user_name]
+        datetimes = [datetime]
+
+        collection.insert([ids, embeddings, texts, user_names, datetimes])
 
         collection.flush()
 
