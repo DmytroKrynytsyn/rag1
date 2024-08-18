@@ -15,7 +15,8 @@ repository: MilvusRepository = MilvusRepository()
 openai.api_key = os.getenv("OPEN_API_KEY")
 
 def prepare_openai_prompt(results: List[dict]) -> str:
-    top_matches = sorted(results, key=lambda x: x.distance)[:3]
+    # Access the distances correctly
+    top_matches = sorted(results, key=lambda x: x.distances[0])[:3]
     
     prompt = "Please summarize the following information into 3-5 sentences:\n\n"
     for idx, match in enumerate(top_matches):
@@ -24,7 +25,6 @@ def prepare_openai_prompt(results: List[dict]) -> str:
     return prompt
 
 def get_embedding(text: str):
-
     response = openai.embeddings.create(
         input=text,
         model="text-embedding-ada-002"
@@ -48,7 +48,6 @@ def semantic_chunker(text: str, chunk_size: int = 1000, overlap_ratio: float = 0
 
 @router.post("/embed/")
 def embed_text(request: EmbedRequest):
-
     print(f"EmbedRequest, text '{request.text[:10]} ...', collection {request.collection_name}, user {request.user_name}")
 
     try:
@@ -64,19 +63,21 @@ def embed_text(request: EmbedRequest):
 
 @router.post("/search/")
 def search_text(request: SearchRequest, limit: int = 5):
-
-    print(f"SearchRequest, text{request.question[:10]}, collection {request.collection_name}")
+    print(f"SearchRequest, text {request.question[:10]}, collection {request.collection_name}")
 
     try:
         query_embedding = get_embedding(request.question)
         results = repository.search_text(query_embedding, request.collection_name, limit)
+
+        print(f"results = {str(results)}")
         
+        # Correctly extract matches and distances
         matches = [
-            {"id": result.id, "distance": result.distance, "text": result.entity.get("text")}
+            {"id": result.id, "distance": result.distances[0], "text": result.entity.get("text")}
             for result in results[0]
         ]
 
-        prompt = prepare_openai_prompt(results)
+        prompt = prepare_openai_prompt(results[0])  # Pass the actual results to the prompt preparation function
 
         response = openai.Completion.create(
             engine="text-davinci-003",
