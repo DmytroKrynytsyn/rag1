@@ -17,7 +17,7 @@ def get_attached_test(files: list, slack_app_token) -> str:
     if not files:
         return ""
     
-    file = file[0]
+    file = files[0]
 
     if file.get("filetype") != "text":
         return ""
