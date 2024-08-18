@@ -3,7 +3,7 @@ import os
 
 rag_backend_ip = os.getenv("RAG_BACKEND_IP")
 
-def search(question: str, channel_name: str) -> str:
+def search(question: str, channel_name: str, debug: bool) -> str:
     try:
         rag_backend_url = f"http://{rag_backend_ip}/search/"
 
@@ -11,8 +11,9 @@ def search(question: str, channel_name: str) -> str:
             response = client.post(
                 rag_backend_url,
                 json={
-                    "text": question,
-                    "collection_name": channel_name
+                    "question": question,
+                    "collection_name": channel_name,
+                    "debug": "true" if debug else "false"
                 }
             )
 

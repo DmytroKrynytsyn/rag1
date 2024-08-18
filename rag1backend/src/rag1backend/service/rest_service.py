@@ -64,10 +64,10 @@ def embed_text(request: EmbedRequest):
 @router.post("/search/")
 def search_text(request: SearchRequest, limit: int = 5):
 
-    print(f"SearchRequest, text{request.text[:10]}, collection {request.collection_name}")
+    print(f"SearchRequest, text{request.question[:10]}, collection {request.collection_name}")
 
     try:
-        query_embedding = get_embedding(request.text)
+        query_embedding = get_embedding(request.question)
         results = repository.search_text(query_embedding, request.collection_name, limit)
         
         matches = [
@@ -85,6 +85,7 @@ def search_text(request: SearchRequest, limit: int = 5):
         
         summary = response['choices'][0]['text'].strip()
 
-        return {"status": "success", "matches": matches, "summary": summary}
+        return {"status": "success", "matches": matches, "summary": summary} if request.debug == "true" else {"status": "success", "summary": summary}
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
