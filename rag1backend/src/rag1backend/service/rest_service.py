@@ -3,10 +3,13 @@ from fastapi import APIRouter, HTTPException
 from rag1backend.model.embed_request import EmbedRequest
 from rag1backend.model.search_request import SearchRequest
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from typing import List, Optional, Union
+from typing import List
 
 import openai
 import os
+
+from openai import OpenAI
+client = OpenAI()
 
 from rag1backend.repository.milvus_repository import MilvusRepository
 
@@ -79,34 +82,17 @@ def search_text(request: SearchRequest, limit: int = 5):
 
         prompt = prepare_openai_prompt(matches, request.question)
 
-        model: str = "gpt-3.5-turbo",
-        system_prompt: str = "You are a helpful assistant.",
-        temperature: float = 0.5,
-        max_tokens: int = 256,
-        n: int = 1,
-        stop: Optional[Union[str, list]] = None,
-        presence_penalty: float = 0,
-        frequency_penalty: float = 0.1,
-        
-        messages = [
-            {"role": "system", "content": f"{system_prompt}"},
-            {"role": "user", "content": prompt},
-        ]
-
-        response = openai.ChatCompletion.create(
-            model=model,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            n=n,
-            stop=stop,
-            presence_penalty=presence_penalty,
-            frequency_penalty=frequency_penalty,
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": f"{prompt}"},
+            ]
         )
 
         print(f"response = {str(response)}")
-        
-        summary = response['choices'][0]['text'].strip()
+
+        summary = response.choices[0].message.content
 
         return {"status": "success", "matches": matches, "summary": summary} if request.debug == "true" else {"status": "success", "summary": summary}
     
