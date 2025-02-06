@@ -1,11 +1,13 @@
 format.json
 .env
+env
 venv
 .venv
 __pycache__
 poetry.lock
 dist/
-.terragrunt-cache/
-.terraform.lock.hcl
 .DS_Store
 *.pem
+.vscode/
+.terra*
+terraform.tfstate*

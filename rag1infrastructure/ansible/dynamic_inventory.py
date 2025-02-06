@@ -39,14 +39,14 @@ def get_private_ip_by_role(role: str) -> str:
 def main():
 
     inventory = {
-        'vector_db': {
-            'hosts': [get_public_ip_by_role('vector_db')], 
+        'vectordb': {
+            'hosts': [get_public_ip_by_role('vectordb')], 
             'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
         },
         'rag_backend': {
             'hosts': [get_public_ip_by_role('rag_backend')], 
             'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no', 
-                     'open_api_key':open_api_key, 'vector_db_ip': get_private_ip_by_role('vector_db')}
+                     'open_api_key':open_api_key, 'vectordb_ip': get_private_ip_by_role('vectordb')}
         },
         'rag_frontend': {
             'hosts': [get_public_ip_by_role('rag_frontend')], 

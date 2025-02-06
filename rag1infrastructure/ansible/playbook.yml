@@ -27,7 +27,7 @@
         enabled: yes
 
 - name: Configure Vector DB EC2 instance to sync directories with S3 on startup and shutdown
-  hosts: vector_db
+  hosts: vectordb
   become: yes
   vars:
     s3_bucket_name: "dkedu"
@@ -98,7 +98,7 @@
         ports:
           - "80:80"
         env:
-          VECTOR_DB_IP: "{{ hostvars[inventory_hostname]['vector_db_ip'] }}"
+          VECTORDB_IP: "{{ hostvars[inventory_hostname]['vectordb_ip'] }}"
           OPEN_API_KEY: "{{ hostvars[inventory_hostname]['open_api_key'] }}"
 
 - name: Configure RAG frontend service

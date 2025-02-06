@@ -6,34 +6,37 @@ data "aws_vpc" "default" {
   default = true
 }
 
-module "vector_db" {
-  source = "git::https://github.com/DmytroKrynytsyn/terraform-modules.git//configurations/vectordb"
+module "vectordb" {
+  source = "git::https://github.com/DmytroKrynytsyn/terraform-modules.git//configuration/vectordb-cluster"
   my_ip    = var.my_ip
-  vpc_id   = aws_vpc.default.id
+  vpc_id   = data.aws_vpc.default.id
+  ami_id = var.ami_id
+  key_name = var.key_name
+  instance_type = var.instance_type
 
   s3_bucket_name = var.s3_bucket_name
   root_volume_size = var.root_volume_size
-  instance_type = var.instance_type
-  ami_id = var.ami_id
+
   vectordb_instance_role = var.vectordb_instance_role
+  
+  stack_name = var.stack_name
+  cluster_name = var.vectordb_cluster_name
 }
 
 module "security_group" {
-  source = "git::https://github.com/DmytroKrynytsyn/terraform-modules.git//infrastructure/security-group"
+  source = "git::https://github.com/DmytroKrynytsyn/terraform-modules.git//infrastructure/aws-security-group"
   my_ip    = var.my_ip
-  vpc_id   = var.vpc_id
+  vpc_id   = data.aws_vpc.default.id
   ingress_ports    = [22, 80] 
 
-  tags = {
-      "StackName" = var.stack_name
-      "ClusterName" = var.cluster_name
-    }
+  stack_name = var.stack_name
+  cluster_name = var.stack_name
 }
 
 resource "aws_instance" "rag_backend" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  security_groups = [aws_security_group.web_sg.name]
+  security_groups = [module.security_group.security_group_name]
 
   key_name = var.key_name
 
@@ -44,15 +47,16 @@ resource "aws_instance" "rag_backend" {
 
   tags = {
     "StackName" = var.stack_name
-    "ClusterName" = var.cluster_name
+    "ClusterName" = var.stack_name
     "InstanceRole" =  var.rag_backend_instance_role
+    "Name" = "${var.stack_name}-${var.stack_name}"
   }
 }
 
 resource "aws_instance" "rag_frontend" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  security_groups = [aws_security_group.web_sg.name]
+  security_groups = [module.security_group.security_group_name]
 
   key_name = var.key_name
 
@@ -63,7 +67,8 @@ resource "aws_instance" "rag_frontend" {
 
   tags = {
     "StackName" = var.stack_name
-    "ClusterName" = var.cluster_name
+    "ClusterName" = var.stack_name
     "InstanceRole" =  var.rag_frontend_instance_role
+    "Name" = "${var.stack_name}-${var.stack_name}"
   }
 }
