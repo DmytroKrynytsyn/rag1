@@ -26,3 +26,19 @@ variable "my_ip" {
   description = "The CIDR allowed to access the instance."
   default     = "89.247.166.160/32"  # Replace with your actual IP address
 }
+
+variable "key_name" {
+  description = "The name of the EC2 key pair to use."
+}
+
+variable "stack_name" {
+  description = "The name of the stack."
+}
+
+variable "cluster_name" {
+  description = "The name of the cluster."
+}
+
+variable "" {
+  
+}
