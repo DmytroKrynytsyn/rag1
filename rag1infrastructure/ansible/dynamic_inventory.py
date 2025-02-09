@@ -38,6 +38,10 @@ def get_private_ips_by_role(role: str) -> list[str]:
     instances = get_ec2s_by_tag("Role", role)
     return [instance['PrivateIpAddress'] for instance in instances]
 
+def get_private_ips_by_stack(stack: str) -> list[str]:
+    instances = get_ec2s_by_tag("Stack", stack)
+    return [instance['PrivateIpAddress'] for instance in instances]
+
 def get_inventory_item_by_role(role: str) -> dict | None:
     public_ips = get_public_ips_by_role(role)
     return None if public_ips is None or len(public_ips) == 0 else {
@@ -48,70 +52,79 @@ def get_inventory_item_by_role(role: str) -> dict | None:
 
 def main():
 
+    kafka_brokers = None 
+    redis_service = None
+
     inventory = {}
+
+    fluentd_private_ip = get_private_ips_by_role('fluentd')[0]
 
     kafka_inventory_item = get_inventory_item_by_role('kafka')
     if kafka_inventory_item:
+        kafka_brokers = ";".join([f"{ip}:9092" for ip in get_private_ips_by_role('kafka')])
+        kafka_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['kafka'] = kafka_inventory_item
 
     redis_primary_inventory_item = get_inventory_item_by_role('redis_primary')
     if redis_primary_inventory_item:
+        redis_primary_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['redis_primary'] = redis_primary_inventory_item
 
     redis_secondary_inventory_item = get_inventory_item_by_role('redis_secondary')
     if redis_secondary_inventory_item:
+        redis_secondary_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['redis_secondary'] = redis_secondary_inventory_item
 
     prometheus_inventory_item = get_inventory_item_by_role('prometheus')
     if prometheus_inventory_item:
+        ips_to_scrape_by_prometheus = ";".join([f"{ip}:9100" for ip in get_private_ips_by_stack('rag1')])
+        prometheus_inventory_item['vars']['targets'] = ips_to_scrape_by_prometheus
+        prometheus_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['prometheus'] = prometheus_inventory_item
 
     grafana_inventory_item = get_inventory_item_by_role('grafana')
     if grafana_inventory_item:
+        grafana_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['grafana'] = grafana_inventory_item
 
     elasticsearch_inventory_item = get_inventory_item_by_role('elasticsearch')
     if elasticsearch_inventory_item:
+        elasticsearch_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['elasticsearch'] = elasticsearch_inventory_item
 
     fluentd_inventory_item = get_inventory_item_by_role('fluentd')
     if fluentd_inventory_item:
+        fluentd_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['fluentd'] = fluentd_inventory_item
 
     kibana_inventory_item = get_inventory_item_by_role('kibana')
     if kibana_inventory_item:
+        kibana_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['kibana'] = kibana_inventory_item
         
     vectordb_inventory_item = get_inventory_item_by_role('vectordb')
     if vectordb_inventory_item:
+        vectordb_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['vectordb'] = vectordb_inventory_item
 
     backend_inventory_item = get_inventory_item_by_role('backend')
     if backend_inventory_item:
+        if kafka_brokers:
+            backend_inventory_item['vars']['kafka_brokers'] = kafka_brokers
+
+        if redis_service:
+            backend_inventory_item['vars']['redis_service'] = redis_service
+
+        backend_inventory_item['vars']['vectordb'] = get_private_ips_by_role('vectordb')
+        backend_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['backend'] = backend_inventory_item
 
     frontend_inventory_item = get_inventory_item_by_role('frontend')
     if frontend_inventory_item:
+        if kafka_brokers:
+            backend_inventory_item['vars']['kafka_brokers'] = kafka_brokers
+        frontend_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['frontend'] = frontend_inventory_item
-
-    
-
-    inventory = {
-        'vectordb': {
-            'hosts': [get_public_ip_by_role('vectordb')], 
-            'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
-        },
-        'rag_backend': {
-            'hosts': [get_public_ip_by_role('rag_backend')], 
-            'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no', 
-                     'open_api_key':open_api_key, 'vectordb_ip': get_private_ip_by_role('vectordb')}
-        },
-        'rag_frontend': {
-            'hosts': [get_public_ip_by_role('rag_frontend')], 
-            'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no', 
-                     'slack_bot_token': slack_bot_token, 'slack_app_token': slack_app_token, 'default_channel': default_channel, 'rag_backend_ip': get_private_ip_by_role('rag_backend')}
-        }
-    }
 
     print(json.dumps(inventory, indent=2))
 
