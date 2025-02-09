@@ -48,8 +48,13 @@ def semantic_chunker(text: str, chunk_size: int = 1000, overlap_ratio: float = 0
     chunks = text_splitter.split_text(text)
     return chunks
 
+
+
 @router.post("/embed/")
 def embed_text(request: EmbedRequest):
+
+
+
     print(f"EmbedRequest, text '{request.text[:10]} ...', collection {request.collection_name}, user {request.user_name}")
 
     try:
