@@ -31,11 +31,11 @@ def get_ec2s_by_tag(tag_key, tag_value) -> list:
 
 
 def get_public_ips_by_role(role: str) -> list[str]:
-    instances = get_ec2s_by_tag("Role", role)
+    instances = get_ec2s_by_tag("InstanceRole", role)
     return [instance['PublicIpAddress'] for instance in instances]
 
 def get_private_ips_by_role(role: str) -> list[str]:
-    instances = get_ec2s_by_tag("Role", role)
+    instances = get_ec2s_by_tag("InstanceRole", role)
     return [instance['PrivateIpAddress'] for instance in instances]
 
 def get_private_ips_by_stack(stack: str) -> list[str]:
@@ -45,8 +45,8 @@ def get_private_ips_by_stack(stack: str) -> list[str]:
 def get_inventory_item_by_role(role: str) -> dict | None:
     public_ips = get_public_ips_by_role(role)
     return None if public_ips is None or len(public_ips) == 0 else {
-        'hosts': [public_ips], 
-        'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': '../cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
+        'hosts': public_ips, 
+        'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': './cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
     }
 
 
@@ -57,7 +57,8 @@ def main():
 
     inventory = {}
 
-    fluentd_private_ip = get_private_ips_by_role('fluentd')[0]
+    fluentd_private_ips = get_private_ips_by_role('fluentd')
+    fluentd_private_ip = fluentd_private_ips[0] if fluentd_private_ips else None
 
     kafka_inventory_item = get_inventory_item_by_role('kafka')
     if kafka_inventory_item:

@@ -7,6 +7,8 @@ s3_bucket_name    = "dkedu"
 key_name          = "cks"
 stack_name        = "rag1"
 
+my_ip = "84.170.243.141/32"
+
 rag_frontend_instance_role = "frontend"
 rag_backend_instance_role  = "backend"
 vectordb_instance_role    = "vectordb"
