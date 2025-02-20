@@ -1,5 +1,5 @@
 ---
-- name: Docker for all
+- name: For all instances
   hosts: all
   become: true
 
@@ -14,17 +14,10 @@
           - awscli
           - tree
         state: present
-    
-    - name: Install Docker
-      yum:
-        name: docker
-        state: present
 
-    - name: Start Docker service
-      systemd:
-        name: docker
-        state: started
-        enabled: true
+  roles:
+    - role: dmytrokrynytsyn.components.dockerr
+
 
 - name: Configure Vector DB EC2 instance to sync directories with S3 on startup and shutdown
   hosts: vectordb
