@@ -52,8 +52,8 @@ def get_inventory_item_by_role(role: str) -> dict | None:
 
 def main():
 
-    kafka_brokers = None 
-    redis_service = None
+    kafka_connection_string = None 
+    redis_ip = None
 
     inventory = {}
 
@@ -62,7 +62,7 @@ def main():
 
     kafka_inventory_item = get_inventory_item_by_role('kafka')
     if kafka_inventory_item:
-        kafka_brokers = ";".join([f"{ip}:9092" for ip in get_private_ips_by_role('kafka')])
+        kafka_connection_string = ";".join([f"{ip}:9092" for ip in get_private_ips_by_role('kafka')])
         kafka_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['kafka'] = kafka_inventory_item
 
@@ -70,6 +70,7 @@ def main():
     if redis_primary_inventory_item:
         redis_primary_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['redis_primary'] = redis_primary_inventory_item
+        redis_ip = redis_primary_inventory_item['hosts'][0]
 
     redis_secondary_inventory_item = get_inventory_item_by_role('redis_secondary')
     if redis_secondary_inventory_item:
@@ -78,8 +79,8 @@ def main():
 
     prometheus_inventory_item = get_inventory_item_by_role('prometheus')
     if prometheus_inventory_item:
-        ips_to_scrape_by_prometheus = ";".join([f"{ip}:9100" for ip in get_private_ips_by_stack('rag1')])
-        prometheus_inventory_item['vars']['targets'] = ips_to_scrape_by_prometheus
+        nodes_to_scrape = get_private_ips_by_stack('rag1')
+        prometheus_inventory_item['vars']['nodes_to_scrape'] = nodes_to_scrape
         prometheus_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['prometheus'] = prometheus_inventory_item
 
@@ -110,20 +111,20 @@ def main():
 
     backend_inventory_item = get_inventory_item_by_role('backend')
     if backend_inventory_item:
-        if kafka_brokers:
-            backend_inventory_item['vars']['kafka_brokers'] = kafka_brokers
+        if kafka_connection_string:
+            backend_inventory_item['vars']['kafka_connection_string'] = kafka_connection_string
 
-        if redis_service:
-            backend_inventory_item['vars']['redis_service'] = redis_service
+        if redis_ip:
+            backend_inventory_item['vars']['redis_ip'] = redis_ip
 
-        backend_inventory_item['vars']['vectordb'] = get_private_ips_by_role('vectordb')
+        backend_inventory_item['vars']['vectordb_ip'] = get_private_ips_by_role('vectordb')
         backend_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['backend'] = backend_inventory_item
 
     frontend_inventory_item = get_inventory_item_by_role('frontend')
     if frontend_inventory_item:
-        if kafka_brokers:
-            backend_inventory_item['vars']['kafka_brokers'] = kafka_brokers
+        if kafka_connection_string:
+            backend_inventory_item['vars']['kafka_connection_string'] = kafka_connection_string
         frontend_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['frontend'] = frontend_inventory_item
 

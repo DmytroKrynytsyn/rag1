@@ -16,17 +16,78 @@
         state: present
 
   roles:
-    - role: dmytrokrynytsyn.components.dockerr
+    - role: dmytrokrynytsyn.components.docker
+    - role: dmytrokrynytsyn.components.fluentbit
+      vars:
+        fluentd_host: "{{ hostvars[inventory_hostname]['fluentd_ip'] }}"
+    - role: dmytrokrynytsyn.components.node_exporter
 
+- name: Kafka cluster
+  hosts: kafka
+  become: true
+  roles:
+    - role: dmytrokrynytsyn.components.kafka_broker
 
-- name: Configure Vector DB EC2 instance to sync directories with S3 on startup and shutdown
+- name: Redis 6 primary
+  hosts: redis6_primary
+  become: true
+  roles:
+    - role: dmytrokrynytsyn.components.redis6_primary
+
+- name: Redis 6 replica
+  hosts: redis6_replica
+  become: true
+  roles:
+    - role: dmytrokrynytsyn.components.redis6_replica
+      vars:
+        redis_primary_host: "{{ hostvars[inventory_hostname]['redis_ip']}}"
+
+- name: Elasticsearch
+  hosts: elasticsearch
+  become: true
+  roles:
+    - role: dmytrokrynytsyn.components.elasticsearch
+
+- name: Fluentd
+  hosts: fluentd
+  become: true
+  roles:
+    - role: dmytrokrynytsyn.components.fluentd
+      vars:
+        elasticsearch_host: "{{ hostvars[inventory_hostname]['elasticsearch_ip'] }}"
+
+- name: Kibana
+  hosts: kibana
+  become: true
+  roles:
+    - role: dmytrokrynytsyn.components.kibana
+      vars:
+        elasticsearch_host: "{{ hostvars[inventory_hostname]['elasticsearch_ip'] }}"
+
+- name: Prometheus
+  hosts: prometheus
+  become: true
+  roles:
+    - role: dmytrokrynytsyn.components.prometheus
+      vars:
+        nodes_to_srcape: "{{ hostvars[inventory_hostname]['nodes_to_scrape']}}"
+
+- name: Grafana
+  hosts: grafana
+  become: true
+  roles:
+    - role: dmytrokrynytsyn.components.grafana
+      vars:
+        prometheus_ip: "{{ hostvars[inventory_hostname]['prometheus_ip'] }}"
+
+- name: Configure Vector DB
   hosts: vectordb
   become: true
   roles:
     - role: dmytrokrynytsyn.components.milvusdb
 
 - name: Configure RAG backend service
-  hosts: rag_backend
+  hosts: backend
   become: true
 
   tasks:
@@ -47,9 +108,11 @@
         env:
           VECTORDB_IP: "{{ hostvars[inventory_hostname]['vectordb_ip'] }}"
           OPEN_API_KEY: "{{ hostvars[inventory_hostname]['open_api_key'] }}"
+          REDIS_IP: "{{ hostvars[inventory_hostname]['redis_ip'] }}"
+          KAFKA_CONNECTION_STRING: "{{ hostvars[inventory_hostname]['kafka_connection_string'] }}"
 
 - name: Configure RAG frontend service
-  hosts: rag_frontend
+  hosts: frontend
   become: true
 
   tasks:
@@ -69,4 +132,5 @@
           SLACK_BOT_TOKEN: "{{ hostvars[inventory_hostname]['slack_bot_token'] }}"
           SLACK_APP_TOKEN: "{{ hostvars[inventory_hostname]['slack_app_token'] }}"
           DEFAULT_CHANNEL: "{{ hostvars[inventory_hostname]['default_channel'] }}"
-          RAG_BACKEND_IP: "{{ hostvars[inventory_hostname]['rag_backend_ip'] }}"
+          RAG_BACKEND_IP: "{{ hostvars[inventory_hostname]['backend_ip'] }}"
+          KAFKA_CONNECTION_STRING: "{{ hostvars[inventory_hostname]['kafka_connection_string'] }}"
