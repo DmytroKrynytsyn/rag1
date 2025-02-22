@@ -49,6 +49,8 @@ def get_inventory_item_by_role(role: str) -> dict | None:
         'vars': { 'ansible_user': 'ec2-user','ansible_ssh_private_key_file': './cks.pem', 'ansible_ssh_common_args': '-o StrictHostKeyChecking=no'}
     }
 
+def get_public_and_private_ip_by_role(role: str) -> list[tuple[str, str]]:
+    return [ ( ec2['PublicIpAddress'], ec2['PrivateIpAddress'] ) for ec2 in get_ec2s_by_tag("Role", role) ]
 
 def main():
 
@@ -74,6 +76,27 @@ def main():
 
     kafka_inventory_item = get_inventory_item_by_role('kafka')
     if kafka_inventory_item:
+        kafka_brokers = get_public_and_private_ip_by_role('kafka_broker')
+        controller_quorum_voters = []
+        hostvars = {}
+
+        for i, kafka_broker in enumerate(kafka_brokers):
+
+            node_id = i + 1
+
+            public_ip = kafka_broker[0]
+            private_ip = kafka_broker[1]
+
+            hostvars[public_ip] = {
+                'ansible_user': 'ec2-user',
+                'ansible_ssh_private_key_file': './cks.pem', 
+                'ansible_ssh_common_args': '-o StrictHostKeyChecking=no',
+                'node_id' : node_id,
+                'private_ip' : private_ip
+            }
+
+            controller_quorum_voters.append(f"{node_id}@{private_ip}:9093")
+
         kafka_connection_string = ";".join([f"{ip}:9092" for ip in get_private_ips_by_role('kafka')])
         kafka_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['kafka'] = kafka_inventory_item
