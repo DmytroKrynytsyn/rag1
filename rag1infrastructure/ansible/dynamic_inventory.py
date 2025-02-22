@@ -60,6 +60,18 @@ def main():
     fluentd_private_ips = get_private_ips_by_role('fluentd')
     fluentd_private_ip = fluentd_private_ips[0] if fluentd_private_ips else None
 
+    elasticsearch_private_ips = get_private_ips_by_role('elasticsearch')
+    elasticsearch_ip = elasticsearch_private_ips[0] if elasticsearch_private_ips else None
+
+    prometheus_private_ips = get_private_ips_by_role('prometheus')
+    prometheus_ip = prometheus_private_ips[0] if prometheus_private_ips else None
+
+    vectordb_private_ips = get_private_ips_by_role('vectordb')
+    vectordb_ip = vectordb_private_ips[0] if vectordb_private_ips else None
+
+    backend_private_ips = get_private_ips_by_role('backend')
+    backend_ip = backend_private_ips[0] if backend_private_ips else None
+
     kafka_inventory_item = get_inventory_item_by_role('kafka')
     if kafka_inventory_item:
         kafka_connection_string = ";".join([f"{ip}:9092" for ip in get_private_ips_by_role('kafka')])
@@ -74,6 +86,7 @@ def main():
 
     redis_secondary_inventory_item = get_inventory_item_by_role('redis_secondary')
     if redis_secondary_inventory_item:
+        redis_secondary_inventory_item['vars']['redis_ip'] = redis_ip
         redis_secondary_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['redis_secondary'] = redis_secondary_inventory_item
 
@@ -87,6 +100,7 @@ def main():
     grafana_inventory_item = get_inventory_item_by_role('grafana')
     if grafana_inventory_item:
         grafana_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
+        grafana_inventory_item['vars']['prometheus_ip'] = prometheus_ip
         inventory['grafana'] = grafana_inventory_item
 
     elasticsearch_inventory_item = get_inventory_item_by_role('elasticsearch')
@@ -97,11 +111,13 @@ def main():
     fluentd_inventory_item = get_inventory_item_by_role('fluentd')
     if fluentd_inventory_item:
         fluentd_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
+        fluentd_inventory_item['vars']['elasticsearch_ip'] = elasticsearch_ip
         inventory['fluentd'] = fluentd_inventory_item
 
     kibana_inventory_item = get_inventory_item_by_role('kibana')
     if kibana_inventory_item:
         kibana_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
+        kibana_inventory_item['vars']['elasticsearch_ip'] = elasticsearch_ip
         inventory['kibana'] = kibana_inventory_item
         
     vectordb_inventory_item = get_inventory_item_by_role('vectordb')
@@ -117,7 +133,7 @@ def main():
         if redis_ip:
             backend_inventory_item['vars']['redis_ip'] = redis_ip
 
-        backend_inventory_item['vars']['vectordb_ip'] = get_private_ips_by_role('vectordb')
+        backend_inventory_item['vars']['vectordb_ip'] = vectordb_ip
         backend_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
         inventory['backend'] = backend_inventory_item
 
@@ -126,6 +142,7 @@ def main():
         if kafka_connection_string:
             backend_inventory_item['vars']['kafka_connection_string'] = kafka_connection_string
         frontend_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
+        frontend_inventory_item['vars']['backend_ip'] = backend_ip
         inventory['frontend'] = frontend_inventory_item
 
     print(json.dumps(inventory, indent=2))

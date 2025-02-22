@@ -16,11 +16,16 @@
         state: present
 
   roles:
-    - role: dmytrokrynytsyn.components.docker
     - role: dmytrokrynytsyn.components.fluentbit
       vars:
         fluentd_host: "{{ hostvars[inventory_hostname]['fluentd_ip'] }}"
     - role: dmytrokrynytsyn.components.node_exporter
+
+- name: Docker
+  hosts: frontend, backend, vectordb
+  become: true
+  roles:
+    - role: dmytrokrynytsyn.components.docker
 
 - name: Kafka cluster
   hosts: kafka
@@ -29,13 +34,13 @@
     - role: dmytrokrynytsyn.components.kafka_broker
 
 - name: Redis 6 primary
-  hosts: redis6_primary
+  hosts: redis_primary
   become: true
   roles:
     - role: dmytrokrynytsyn.components.redis6_primary
 
 - name: Redis 6 replica
-  hosts: redis6_replica
+  hosts: redis_secondary
   become: true
   roles:
     - role: dmytrokrynytsyn.components.redis6_replica
