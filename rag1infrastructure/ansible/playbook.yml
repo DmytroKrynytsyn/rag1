@@ -28,19 +28,19 @@
   roles:
     - role: dmytrokrynytsyn.components.kafka_broker
 
-- name: Redis 6 primary
-  hosts: redis6_primary
+- name: Redis primary
+  hosts: redis_primary
   become: true
   roles:
     - role: dmytrokrynytsyn.components.redis6_primary
 
-- name: Redis 6 replica
-  hosts: redis6_replica
+- name: Redis secondary
+  hosts: redis_secondary
   become: true
   roles:
     - role: dmytrokrynytsyn.components.redis6_replica
       vars:
-        redis_primary_host: "{{ hostvars[inventory_hostname]['redis_ip']}}"
+        redis_primary_host: "{{ hostvars[inventory_hostname]['redis_primary_host']}}"
 
 - name: Elasticsearch
   hosts: elasticsearch
@@ -108,7 +108,7 @@
         env:
           VECTORDB_IP: "{{ hostvars[inventory_hostname]['vectordb_ip'] }}"
           OPEN_API_KEY: "{{ hostvars[inventory_hostname]['open_api_key'] }}"
-          REDIS_IP: "{{ hostvars[inventory_hostname]['redis_ip'] }}"
+          REDIS_IP: "{{ hostvars[inventory_hostname]['redis_primary_host'] }}"
           KAFKA_CONNECTION_STRING: "{{ hostvars[inventory_hostname]['kafka_connection_string'] }}"
 
 - name: Configure RAG frontend service
