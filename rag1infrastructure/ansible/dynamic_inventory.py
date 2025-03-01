@@ -49,11 +49,7 @@ def get_inventory_item_by_role(role: str) -> dict | None:
     }
 
 def get_public_and_private_ip_by_role(role: str) -> list[tuple[str, str]]:
-<<<<<<< HEAD
     return [ ( ec2['PublicIpAddress'], ec2['PrivateIpAddress'] ) for ec2 in get_ec2s_by_tag("InstanceRole", role) ]
-=======
-    return [ ( ec2['PublicIpAddress'], ec2['PrivateIpAddress'] ) for ec2 in get_ec2s_by_tag("Role", role) ]
->>>>>>> 4b9c2db54018b6b121515609d0a6407328e23c3c
 
 def main():
 
@@ -91,7 +87,6 @@ def main():
 
     kafka_inventory_item = get_inventory_item_by_role('kafka')
     if kafka_inventory_item:
-<<<<<<< HEAD
         controller_quorum_voters = []
         private_ips = []
         for node_id, (public_ip, private_ip) in enumerate( get_public_and_private_ip_by_role('kafka')):
@@ -103,32 +98,6 @@ def main():
 
         kafka_connection_string = ";".join([f"{private_ip}:9092" for private_ip in private_ips])
         groups['kafka'] = kafka_inventory_item
-=======
-        kafka_brokers = get_public_and_private_ip_by_role('kafka_broker')
-        controller_quorum_voters = []
-        hostvars = {}
-
-        for i, kafka_broker in enumerate(kafka_brokers):
-
-            node_id = i + 1
-
-            public_ip = kafka_broker[0]
-            private_ip = kafka_broker[1]
-
-            hostvars[public_ip] = {
-                'ansible_user': 'ec2-user',
-                'ansible_ssh_private_key_file': './cks.pem', 
-                'ansible_ssh_common_args': '-o StrictHostKeyChecking=no',
-                'node_id' : node_id,
-                'private_ip' : private_ip
-            }
-
-            controller_quorum_voters.append(f"{node_id}@{private_ip}:9093")
-
-        kafka_connection_string = ";".join([f"{ip}:9092" for ip in get_private_ips_by_role('kafka')])
-        kafka_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
-        inventory['kafka'] = kafka_inventory_item
->>>>>>> 4b9c2db54018b6b121515609d0a6407328e23c3c
 
     redis_primary_inventory_item = get_inventory_item_by_role('redis_primary')
     if redis_primary_inventory_item:
@@ -137,14 +106,8 @@ def main():
 
     redis_secondary_inventory_item = get_inventory_item_by_role('redis_secondary')
     if redis_secondary_inventory_item:
-<<<<<<< HEAD
         redis_secondary_inventory_item['vars']['redis_primary_host'] = redis_secondary_private_ip
         groups['redis_secondary'] = redis_secondary_inventory_item
-=======
-        redis_secondary_inventory_item['vars']['redis_ip'] = redis_ip
-        redis_secondary_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
-        inventory['redis_secondary'] = redis_secondary_inventory_item
->>>>>>> 4b9c2db54018b6b121515609d0a6407328e23c3c
 
     prometheus_inventory_item = get_inventory_item_by_role('prometheus')
     if prometheus_inventory_item:
@@ -153,14 +116,8 @@ def main():
 
     grafana_inventory_item = get_inventory_item_by_role('grafana')
     if grafana_inventory_item:
-<<<<<<< HEAD
         grafana_inventory_item['vars']['prometheus_ip'] = get_private_ips_by_role('prometheus')[0]
         groups['grafana'] = grafana_inventory_item
-=======
-        grafana_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
-        grafana_inventory_item['vars']['prometheus_ip'] = prometheus_ip
-        inventory['grafana'] = grafana_inventory_item
->>>>>>> 4b9c2db54018b6b121515609d0a6407328e23c3c
 
     elasticsearch_inventory_item = get_inventory_item_by_role('elasticsearch')
     if elasticsearch_inventory_item:
@@ -168,7 +125,6 @@ def main():
 
     fluentd_inventory_item = get_inventory_item_by_role('fluentd')
     if fluentd_inventory_item:
-<<<<<<< HEAD
         fluentd_inventory_item['vars']['elasticsearch_ip'] = elasticsearch_private_ip
         groups['fluentd'] = fluentd_inventory_item
 
@@ -176,18 +132,7 @@ def main():
     if kibana_inventory_item:
         kibana_inventory_item['vars']['elasticsearch_ip'] = elasticsearch_private_ip
         groups['kibana'] = kibana_inventory_item
-=======
-        fluentd_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
-        fluentd_inventory_item['vars']['elasticsearch_ip'] = elasticsearch_ip
-        inventory['fluentd'] = fluentd_inventory_item
-
-    kibana_inventory_item = get_inventory_item_by_role('kibana')
-    if kibana_inventory_item:
-        kibana_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
-        kibana_inventory_item['vars']['elasticsearch_ip'] = elasticsearch_ip
-        inventory['kibana'] = kibana_inventory_item
->>>>>>> 4b9c2db54018b6b121515609d0a6407328e23c3c
-        
+   
     vectordb_inventory_item = get_inventory_item_by_role('vectordb')
     if vectordb_inventory_item:
         groups['vectordb'] = vectordb_inventory_item
@@ -200,28 +145,19 @@ def main():
         if redis_secondary_private_ip:
             backend_inventory_item['vars']['redis_primary_host'] = redis_secondary_private_ip
 
-<<<<<<< HEAD
         backend_inventory_item['vars']['vectordb_ip'] = get_private_ips_by_role('vectordb')[0]
+        backend_inventory_item['vars']['open_api_key'] = open_api_key
         groups['backend'] = backend_inventory_item
-=======
-        backend_inventory_item['vars']['vectordb_ip'] = vectordb_ip
-        backend_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
-        inventory['backend'] = backend_inventory_item
->>>>>>> 4b9c2db54018b6b121515609d0a6407328e23c3c
 
     frontend_inventory_item = get_inventory_item_by_role('frontend')
     if frontend_inventory_item:
         frontend_inventory_item['vars']['backend_ip'] = get_private_ips_by_role('backend')[0]
+        frontend_inventory_item['vars']['slack_app_token'] = slack_app_token
+        frontend_inventory_item['vars']['slack_bot_token'] = slack_bot_token
+        frontend_inventory_item['vars']['default_channel'] = default_channel
         if kafka_connection_string:
-<<<<<<< HEAD
             frontend_inventory_item['vars']['kafka_connection_string'] = kafka_connection_string
         groups['frontend'] = frontend_inventory_item
-=======
-            backend_inventory_item['vars']['kafka_connection_string'] = kafka_connection_string
-        frontend_inventory_item['vars']['fluentd_ip'] = fluentd_private_ip
-        frontend_inventory_item['vars']['backend_ip'] = backend_ip
-        inventory['frontend'] = frontend_inventory_item
->>>>>>> 4b9c2db54018b6b121515609d0a6407328e23c3c
 
     groups['_meta'] = { 'hostvars': all_hostvars }
     groups['all'] = { 'vars': all_vars }
