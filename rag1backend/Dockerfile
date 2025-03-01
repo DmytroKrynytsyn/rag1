@@ -2,7 +2,7 @@
 FROM python:3.12-slim as builder
 
 # Install Poetry
-RUN pip install poetry
+RUN pip install poetry==1.8.5
 
 # Set the working directory
 WORKDIR /app
