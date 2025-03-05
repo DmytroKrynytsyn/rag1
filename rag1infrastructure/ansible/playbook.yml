@@ -19,7 +19,13 @@
     - role: dmytrokrynytsyn.components.fluentbit
       vars:
         fluentd_host: "{{ hostvars[inventory_hostname]['fluentd_ip'] }}"
-    - role: dmytrokrynytsyn.components.node_exporter
+    - role: dmytrokrynytsyn.components.telegraf_exporter
+
+- name: Telegraf Gateway
+  hosts: telegraf_gateway
+  become: true
+  roles:
+    - role: dmytrokrynytsyn.components.telegraf_gateway
 
 - name: Docker
   hosts: frontend, backend, vectordb

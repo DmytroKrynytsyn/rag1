@@ -52,6 +52,18 @@ module "redis" {
   cluster_name = var.redis_cluster_name
 }
 
+module "telegraf-gateway" {
+  source = "git::https://github.com/DmytroKrynytsyn/terraform-modules.git//configuration/telegraf-gateway"
+  my_ip    = var.my_ip
+  vpc_id   = data.aws_vpc.default.id
+  ami_id = var.ami_id
+  key_name = var.key_name
+  stack_name = var.stack_name
+
+  instance_role = var.telegraf_gateway_instance_role
+  cluster_name = var.telegraf_gateway_cluster_name
+}
+
 module "prometheus-grafana" {
   source = "git::https://github.com/DmytroKrynytsyn/terraform-modules.git//configuration/prometheus-grafana-cluster"
   my_ip    = var.my_ip

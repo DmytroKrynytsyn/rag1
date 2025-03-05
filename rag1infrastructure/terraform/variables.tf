@@ -97,3 +97,11 @@ variable "kibana_instance_role" {
 variable "efk_cluster_name" {
   description = "The name of the EFK cluster." 
 }
+
+variable "telegraf_gateway_instance_role" {
+  description = "InstanceRole for Telegraf gateway instance."
+}
+
+variable "telegraf_gateway_cluster_name" {
+  description = "The name of the Telegraf gateway cluster." 
+}

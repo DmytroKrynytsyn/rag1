@@ -29,3 +29,6 @@ elasticsearch_instance_role = "elasticsearch"
 fluentd_instance_role = "fluentd"
 kibana_instance_role = "kibana"
 efk_cluster_name = "efk-cluster"
+
+telegraf_gateway_instance_role    = "telegraf_gateway"
+telegraf_gateway_cluster_name = "telegraf-gateway-cluster"

@@ -70,11 +70,13 @@ def main():
     if fluentd_private_ip:
         all_vars['fluentd_ip'] = fluentd_private_ip
 
-    elasticsearch_private_ips = get_private_ips_by_role('elasticsearch')
-    elasticsearch_private_ip = elasticsearch_private_ips[0] if elasticsearch_private_ips else None
+    telegraf_gateway_private_ips = get_private_ips_by_role('telegraf_gateway')
+    telegraf_gateway_private_ip = telegraf_gateway_private_ips[0] if telegraf_gateway_private_ips else None
+    if telegraf_gateway_private_ip:
+        all_vars['telegraf_gateway_ip'] = telegraf_gateway_private_ip
 
     elasticsearch_private_ips = get_private_ips_by_role('elasticsearch')
-    elasticsearch_ip = elasticsearch_private_ips[0] if elasticsearch_private_ips else None
+    elasticsearch_private_ip = elasticsearch_private_ips[0] if elasticsearch_private_ips else None
 
     prometheus_private_ips = get_private_ips_by_role('prometheus')
     prometheus_ip = prometheus_private_ips[0] if prometheus_private_ips else None
@@ -111,12 +113,12 @@ def main():
 
     prometheus_inventory_item = get_inventory_item_by_role('prometheus')
     if prometheus_inventory_item:
-        prometheus_inventory_item['vars']['nodes_to_scrape'] = get_private_ips_by_stack('rag1')
+        prometheus_inventory_item['vars']['nodes_to_scrape'] = [telegraf_gateway_private_ip]
         groups['prometheus'] = prometheus_inventory_item
 
     grafana_inventory_item = get_inventory_item_by_role('grafana')
     if grafana_inventory_item:
-        grafana_inventory_item['vars']['prometheus_ip'] = get_private_ips_by_role('prometheus')[0]
+        grafana_inventory_item['vars']['prometheus_ip'] = prometheus_ip
         groups['grafana'] = grafana_inventory_item
 
     elasticsearch_inventory_item = get_inventory_item_by_role('elasticsearch')
@@ -145,13 +147,13 @@ def main():
         if redis_secondary_private_ip:
             backend_inventory_item['vars']['redis_primary_host'] = redis_secondary_private_ip
 
-        backend_inventory_item['vars']['vectordb_ip'] = get_private_ips_by_role('vectordb')[0]
+        backend_inventory_item['vars']['vectordb_ip'] = vectordb_ip
         backend_inventory_item['vars']['open_api_key'] = open_api_key
         groups['backend'] = backend_inventory_item
 
     frontend_inventory_item = get_inventory_item_by_role('frontend')
     if frontend_inventory_item:
-        frontend_inventory_item['vars']['backend_ip'] = get_private_ips_by_role('backend')[0]
+        frontend_inventory_item['vars']['backend_ip'] = backend_ip
         frontend_inventory_item['vars']['slack_app_token'] = slack_app_token
         frontend_inventory_item['vars']['slack_bot_token'] = slack_bot_token
         frontend_inventory_item['vars']['default_channel'] = default_channel
