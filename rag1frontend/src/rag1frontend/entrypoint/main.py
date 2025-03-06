@@ -3,6 +3,11 @@ import requests
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from dotenv import load_dotenv
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 from ..handlers.call_backend import search, embed
 from ..utils.slack import get_channel_name_by_id
@@ -41,6 +46,7 @@ def main():
     def send_hello_message():
         app.client.chat_postMessage(channel=DEFAULT_CHANNEL, text="Hello, RAG!")
         print("Hello, RAG!")
+        logger.info("Hello, RAG!!")
 
     app = App(token=SLACK_BOT_TOKEN)
 
