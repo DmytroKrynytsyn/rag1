@@ -13,6 +13,7 @@
         name: 
           - awscli
           - tree
+          - nmap
         state: present
 
   roles:
@@ -20,6 +21,8 @@
       vars:
         fluentd_host: "{{ hostvars[inventory_hostname]['fluentd_ip'] }}"
     - role: dmytrokrynytsyn.components.telegraf_exporter
+      vars:
+        telegraf_gateway_ip: "{{ hostvars[inventory_hostname]['telegraf_gateway_ip'] }}"
 
 - name: Telegraf Gateway
   hosts: telegraf_gateway

@@ -54,8 +54,6 @@ def get_public_and_private_ip_by_role(role: str) -> list[tuple[str, str]]:
 def main():
 
     kafka_connection_string = None 
-    redis_secondary_private_ip = None
-    elasticsearch_private_ip = None
 
     all_vars = {
       "ansible_user": "ec2-user",
@@ -87,6 +85,9 @@ def main():
     backend_private_ips = get_private_ips_by_role('backend')
     backend_ip = backend_private_ips[0] if backend_private_ips else None
 
+    redis_primary_private_ips = get_private_ips_by_role('redis_primary')
+    redis_primary_private_ip = redis_primary_private_ips[0] if redis_primary_private_ips else None
+
     kafka_inventory_item = get_inventory_item_by_role('kafka')
     if kafka_inventory_item:
         controller_quorum_voters = []
@@ -101,14 +102,17 @@ def main():
         kafka_connection_string = ";".join([f"{private_ip}:9092" for private_ip in private_ips])
         groups['kafka'] = kafka_inventory_item
 
+    telegraf_gateway_inventory_item = get_inventory_item_by_role('telegraf_gateway')
+    if telegraf_gateway_inventory_item:
+        groups['telegraf_gateway'] = telegraf_gateway_inventory_item
+
     redis_primary_inventory_item = get_inventory_item_by_role('redis_primary')
     if redis_primary_inventory_item:
         groups['redis_primary'] = redis_primary_inventory_item
-        redis_secondary_private_ip = get_private_ips_by_role('fluentd')[0]
 
     redis_secondary_inventory_item = get_inventory_item_by_role('redis_secondary')
     if redis_secondary_inventory_item:
-        redis_secondary_inventory_item['vars']['redis_primary_host'] = redis_secondary_private_ip
+        redis_secondary_inventory_item['vars']['redis_primary_host'] = redis_primary_private_ip
         groups['redis_secondary'] = redis_secondary_inventory_item
 
     prometheus_inventory_item = get_inventory_item_by_role('prometheus')
@@ -144,8 +148,8 @@ def main():
         if kafka_connection_string:
             backend_inventory_item['vars']['kafka_connection_string'] = kafka_connection_string
 
-        if redis_secondary_private_ip:
-            backend_inventory_item['vars']['redis_primary_host'] = redis_secondary_private_ip
+        if redis_primary_private_ip:
+            backend_inventory_item['vars']['redis_primary_host'] = redis_primary_private_ip
 
         backend_inventory_item['vars']['vectordb_ip'] = vectordb_ip
         backend_inventory_item['vars']['open_api_key'] = open_api_key

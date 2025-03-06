@@ -40,6 +40,7 @@ def main():
 
     def send_hello_message():
         app.client.chat_postMessage(channel=DEFAULT_CHANNEL, text="Hello, RAG!")
+        print("Hello, RAG!")
 
     app = App(token=SLACK_BOT_TOKEN)
 
@@ -71,7 +72,7 @@ def main():
             say(embed(text_to_embed, user, datetime, channel_name))
             return
 
-        say(f"T`ry - searh: ... OR embed: ...")
+        say("Try - searh: ... OR embed: ...")
 
 
     handler = SocketModeHandler(app, SLACK_APP_TOKEN)
