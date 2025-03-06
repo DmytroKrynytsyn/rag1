@@ -117,6 +117,7 @@
         name: rag1backend_container
         image: dkrinitsyn/rag1backend:latest
         state: started
+        log_driver: journald
         ports:
           - "80:80"
         env:
@@ -142,6 +143,7 @@
         name: rag1frontend_container
         image: dkrinitsyn/rag1frontend:latest
         state: started
+        log_driver: journald
         env:
           SLACK_BOT_TOKEN: "{{ hostvars[inventory_hostname]['slack_bot_token'] }}"
           SLACK_APP_TOKEN: "{{ hostvars[inventory_hostname]['slack_app_token'] }}"
