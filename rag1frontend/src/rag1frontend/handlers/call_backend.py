@@ -2,8 +2,7 @@ import httpx
 import os
 from confluent_kafka import Producer
 from confluent_kafka.admin import AdminClient, NewTopic
-
-from rag1frontend.entrypoint.main.logger import logger
+from ..utils.log import logger
 
 
 rag_backend_ip = os.getenv("RAG_BACKEND_IP")
