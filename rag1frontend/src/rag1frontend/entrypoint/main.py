@@ -7,25 +7,21 @@ import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("rag1frontend")
 
 from ..handlers.call_backend import search, embed
 from ..utils.slack import get_channel_name_by_id
 
 load_dotenv()
 
-SEARCH_PREFIX = "search:"
-DEBUG_SEARCH_PREFIX = "debug search:"
-EMBED_PREFIX = "embed:"
-
-def get_attached_test(files: list, slack_app_token) -> str:
+def get_attached_text(files: list, slack_app_token) -> str | None:
     if not files:
-        return ""
+        return None
     
     file = files[0]
 
     if file.get("filetype") != "text":
-        return ""
+        return None
 
     file_url = file.get("url_private")
     
@@ -35,7 +31,8 @@ def get_attached_test(files: list, slack_app_token) -> str:
     if response.status_code == 200:
         return response.text
     else:
-        return ""
+        return None
+
 
 def main():
     
@@ -45,8 +42,7 @@ def main():
 
     def send_hello_message():
         app.client.chat_postMessage(channel=DEFAULT_CHANNEL, text="Hello, RAG!")
-        print("Hello, RAG!")
-        logger.info("Hello, RAG!!")
+        logger.info("Hello, RAG!")
 
     app = App(token=SLACK_BOT_TOKEN)
 
@@ -59,26 +55,21 @@ def main():
         channel_name = get_channel_name_by_id(channel_id, app)
         user = event.get("user")
 
-        print(f"handling {text} from {user} in {channel_id}/{channel_name}")
+        logger.info(f"handling {text} from {user} in {channel_id}/{channel_name}")
         
         if channel_id == DEFAULT_CHANNEL and "hello" in text.lower():
             say(f"Hello, <@{user}>!")
             return
         
-        if text.lower().startswith(SEARCH_PREFIX):
-            say(search(text.lower()[len(SEARCH_PREFIX):], channel_name, False))
+        attached_text = get_attached_text(event.get("files", []), SLACK_BOT_TOKEN)
+        if attached_text:
+            embed(attached_text, user, datetime, channel_name)
+            say(f"{len(attached_text)} characters sent to backend for embedding")
             return
-
-        if text.lower().startswith(DEBUG_SEARCH_PREFIX):
-            say(search(text.lower()[len(DEBUG_SEARCH_PREFIX):], channel_name, True))
-            return
-
-        if text.lower().startswith(EMBED_PREFIX):
-            text_to_embed = text.lower()[len(EMBED_PREFIX):] + get_attached_test(event.get("files", []), SLACK_BOT_TOKEN)
-            say(embed(text_to_embed, user, datetime, channel_name))
-            return
-
-        say("Try - searh: ... OR embed: ...")
+        
+        say(f"Searching for answer...")
+        answer = search(text, channel_name, False)
+        say(f"{answer}")
 
 
     handler = SocketModeHandler(app, SLACK_APP_TOKEN)
