@@ -3,6 +3,7 @@ import os
 from confluent_kafka import Producer
 from confluent_kafka.admin import AdminClient, NewTopic
 from ..utils.log import logger
+import json
 
 
 rag_backend_ip = os.getenv("RAG_BACKEND_IP")
@@ -37,7 +38,7 @@ def embed(text: str, channel_name: str) -> None:
         logger.info(f"Embedding {len(text)} characters from {channel_name}")
         producer.produce(TOPIC_NAME, 
                          key=None, 
-                         value={"text": text, "collection_name": channel_name}, 
+                         value=json.dumps({"text": text, "collection_name": channel_name}), 
                          callback=delivery_report)
         producer.flush()
     except httpx.RequestError as exc:
