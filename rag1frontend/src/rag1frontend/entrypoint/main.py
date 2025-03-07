@@ -12,11 +12,13 @@ load_dotenv()
 
 def get_attached_text(files: list, slack_app_token) -> str | None:
     if not files:
+        logger.info(f"No files attached")
         return None
     
     file = files[0]
 
     if file.get("filetype") != "text":
+        logger.info(f"File type {file.get('filetype')} not supported")
         return None
 
     file_url = file.get("url_private")
@@ -25,6 +27,7 @@ def get_attached_text(files: list, slack_app_token) -> str | None:
     response = requests.get(file_url, headers=headers)
     
     if response.status_code == 200:
+        logger.info(f"File downloaded from {file_url}, length = {len(response.text)}")  
         return response.text
     else:
         return None
@@ -52,6 +55,8 @@ def main():
         user = event.get("user")
 
         logger.info(f"handling {text} from {user} in {channel_id}/{channel_name}")
+        logger.info(f"event = {event}")
+        logger.info(f"body = {body}")
         
         if channel_id == DEFAULT_CHANNEL and "hello" in text.lower():
             say(f"Hello, <@{user}>!")

@@ -99,7 +99,7 @@ def main():
 
         kafka_inventory_item['vars']['controller_quorum_voters'] = ",".join(controller_quorum_voters)
 
-        kafka_connection_string = ";".join([f"{private_ip}:9092" for private_ip in private_ips])
+        kafka_connection_string = ",".join([f"{private_ip}:9092" for private_ip in private_ips])
         groups['kafka'] = kafka_inventory_item
 
     telegraf_gateway_inventory_item = get_inventory_item_by_role('telegraf_gateway')
