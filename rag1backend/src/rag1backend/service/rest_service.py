@@ -9,6 +9,8 @@ import asyncio
 
 import openai
 import os
+import datetime
+import json
 
 from ..utils.log import logger
 
@@ -59,6 +61,8 @@ async def consume():
     try:
         async for msg in consumer:
             logger.info(f"Received message: {msg.value}, {len(msg.value)} bytes")
+            json_object = json.loads(msg.value.decode("utf-8"))
+            embed_text(json_object["text"], json_object["collection_name"])
     finally:
         await consumer.stop()
 
@@ -101,21 +105,20 @@ def semantic_chunker(text: str, chunk_size: int = 1000, overlap_ratio: float = 0
     return chunks
 
 
-@router.post("/embed/")
-def embed_text(request: EmbedRequest):
+def embed_text(text: str, collection_name: str):
 
-    logger.info(f"EmbedRequest, text '{request.text[:10]} ...', collection {request.collection_name}, user {request.user_name}")
+    logger.info(f"EmbedRequest, text '{text[:10]} ...', collection {collection_name}")
 
     try:
-        chunks = semantic_chunker(request.text, chunk_size=1000, overlap_ratio=0.2)
+        chunks = semantic_chunker(text, chunk_size=1000, overlap_ratio=0.2)
         chunks = [chunk.strip() for chunk in chunks if chunk.strip()]
         for chunk in chunks:
             embedding = get_embedding(chunk)
-            repository.insert_text(embedding, chunk, request.user_name, request.datetime, request.collection_name)
+            repository.insert_text(embedding, chunk, int(datetime.datetime.now().timestamp()) , collection_name)
 
-        return {"status": "success", "message": f"Text embedded, {len(chunks)} chunks"}
+        logger.info(f"Text embedded, {len(chunks)} chunks")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error embedding text: {e}")
 
 @router.post("/search/")
 def search_text(request: SearchRequest):
@@ -142,7 +145,7 @@ def search_text(request: SearchRequest):
             ]
         )
 
-        logger.info(f"response = {str(response)}")
+        logger.info(f"LLM response: {str(response)}")
 
         summary = response.choices[0].message.content
 

@@ -50,7 +50,7 @@ def main():
         event = body.get("event", {})
         text: str = event.get("text", "")
         channel_id = event.get("channel")
-        datetime = int(float(event.get("ts")))
+        #datetime = int(float(event.get("ts")))
         channel_name = get_channel_name_by_id(channel_id, app)
         user = event.get("user")
 
