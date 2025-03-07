@@ -1,4 +1,4 @@
 import logging
 
 logging.basicConfig(level=logging.INFO, format="ragapp %(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger("rag1frontend")
+logger = logging.getLogger("rag1backend")

@@ -2,13 +2,14 @@ from pymilvus import Collection, CollectionSchema, FieldSchema, DataType, connec
 
 from typing import List
 import os
+from ..utils.log import logger
 
 vectordb_ip = os.getenv("VECTORDB_IP")
 
 class MilvusRepository:
     def __init__(self):
         connections.connect("default", host=vectordb_ip, port="19530")
-        print(f'Connected to {vectordb_ip} vector db')
+        logger.info(f'Connected to {vectordb_ip} vector db')
 
     def _get_or_create_collection(self, collection_name: str) -> Collection:
         if collection_name in utility.list_collections():
@@ -18,7 +19,6 @@ class MilvusRepository:
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
             FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=1536),
             FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=65535),
-            FieldSchema(name="user_name", dtype=DataType.VARCHAR, max_length=255),
             FieldSchema(name="datetime", dtype=DataType.INT64)
         ]
         
@@ -34,20 +34,19 @@ class MilvusRepository:
         
         collection.create_index(field_name="embedding", index_params=index_params)
         
-        print(f"Collection {collection_name} created")
+        logger.info(f"Collection {collection_name} created")
         
         return collection
 
-    def insert_text(self, embedding: List[float], text: str, user_name: str, datetime: int, collection_name: str) -> None:
+    def insert_text(self, embedding: List[float], text: str, datetime: int, collection_name: str) -> None:
 
         collection = self._get_or_create_collection(collection_name)
 
         embeddings = [embedding]
         texts = [text]
-        user_names = [user_name]
         datetimes = [datetime]
 
-        collection.insert([embeddings, texts, user_names, datetimes])
+        collection.insert([embeddings, texts, datetimes])
 
         collection.flush()
 
@@ -62,6 +61,6 @@ class MilvusRepository:
             anns_field="embedding",
             param=search_params,
             limit=limit,
-            output_fields=["text", "user_name", "datetime"]
+            output_fields=["text", "datetime"]
         )
         return results
