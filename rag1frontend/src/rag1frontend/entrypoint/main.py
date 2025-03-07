@@ -64,7 +64,7 @@ def main():
         
         attached_text = get_attached_text(event.get("files", []), SLACK_BOT_TOKEN)
         if attached_text:
-            embed(attached_text, user, datetime, channel_name)
+            embed(attached_text, channel_name)
             say(f"{len(attached_text)} characters sent to backend for embedding")
             return
         
