@@ -60,7 +60,7 @@ def search(question: str, channel_name: str, debug: bool) -> str | None:
             )
 
         if response.status_code == 200:
-            return str(response.json())
+            return response.json()
         else:
             logger.error(f'Error calling search backend {response.status_code} {response.text}')
 
