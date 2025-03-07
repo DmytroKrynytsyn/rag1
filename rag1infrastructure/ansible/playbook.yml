@@ -20,9 +20,12 @@
     - role: dmytrokrynytsyn.components.fluentbit
       vars:
         fluentd_host: "{{ hostvars[inventory_hostname]['fluentd_ip'] }}"
+      when: "'fluentd_ip' in hostvars[inventory_hostname]"
+
     - role: dmytrokrynytsyn.components.telegraf_exporter
       vars:
         telegraf_gateway_ip: "{{ hostvars[inventory_hostname]['telegraf_gateway_ip'] }}"
+      when: "'telegraf_gateway_ip' in hostvars[inventory_hostname]"
 
 - name: Telegraf Gateway
   hosts: telegraf_gateway

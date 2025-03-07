@@ -7,7 +7,7 @@ s3_bucket_name    = "dkedu"
 key_name          = "cks"
 stack_name        = "rag1"
 
-my_ip = "84.170.241.57/32"
+my_ip = "84.170.243.107/32"
 
 rag_frontend_instance_role = "frontend"
 rag_backend_instance_role  = "backend"
@@ -32,3 +32,6 @@ efk_cluster_name = "efk-cluster"
 
 telegraf_gateway_instance_role    = "telegraf_gateway"
 telegraf_gateway_cluster_name = "telegraf-gateway-cluster"
+
+enable_logging = false
+enable_metrics = false

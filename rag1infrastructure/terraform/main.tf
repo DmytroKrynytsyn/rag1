@@ -53,6 +53,9 @@ module "redis" {
 }
 
 module "telegraf-gateway" {
+
+  count  = var.enable_metrics ? 1 : 0
+
   source = "git::https://github.com/DmytroKrynytsyn/terraform-modules.git//configuration/telegraf-gateway"
   my_ip    = var.my_ip
   vpc_id   = data.aws_vpc.default.id
@@ -65,6 +68,9 @@ module "telegraf-gateway" {
 }
 
 module "prometheus-grafana" {
+
+  count  = var.enable_metrics ? 1 : 0
+
   source = "git::https://github.com/DmytroKrynytsyn/terraform-modules.git//configuration/prometheus-grafana-cluster"
   my_ip    = var.my_ip
   vpc_id   = data.aws_vpc.default.id
@@ -78,6 +84,9 @@ module "prometheus-grafana" {
 }
 
 module "efk" {
+
+  count  = var.enable_logging ? 1 : 0
+
   source = "git::https://github.com/DmytroKrynytsyn/terraform-modules.git//configuration/elasticsearch-fluentd-kibana-cluster"
   my_ip    = var.my_ip
   vpc_id   = data.aws_vpc.default.id

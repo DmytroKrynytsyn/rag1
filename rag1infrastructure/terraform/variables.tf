@@ -105,3 +105,13 @@ variable "telegraf_gateway_instance_role" {
 variable "telegraf_gateway_cluster_name" {
   description = "The name of the Telegraf gateway cluster." 
 }
+
+variable "enable_logging" {
+  type    = bool
+  default = true 
+}
+
+variable "enable_metrics" {
+  type    = bool
+  default = true 
+}
