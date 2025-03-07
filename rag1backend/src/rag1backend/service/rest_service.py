@@ -139,6 +139,7 @@ def search_text(request: SearchRequest):
 
         response = openai.chat.completions.create(
             model="gpt-4o-mini",
+            temperature=0.2,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": f"{prompt}"},

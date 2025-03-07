@@ -70,7 +70,7 @@ def main():
         
         say(f"Searching for answer...")
         answer = search(text, channel_name, False)
-        say(f"{answer}")
+        say(f"{answer["summary"]}")
 
 
     handler = SocketModeHandler(app, SLACK_APP_TOKEN)
