@@ -58,7 +58,7 @@ async def consume():
 
     try:
         async for msg in consumer:
-            logger.info(f"Received message: {len(msg.value)} bytes")
+            logger.info(f"Received message: {msg.value}, {len(msg.value)} bytes")
     finally:
         await consumer.stop()
 
