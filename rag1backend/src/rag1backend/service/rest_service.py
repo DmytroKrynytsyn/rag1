@@ -7,6 +7,9 @@ from typing import List
 from aiokafka import AIOKafkaConsumer
 import asyncio
 
+import hashlib
+import redis.asyncio as redis
+
 import openai
 import os
 import datetime
@@ -21,6 +24,9 @@ router = APIRouter(redirect_slashes=False)
 repository: MilvusRepository = MilvusRepository()
 
 openai.api_key = os.getenv("OPEN_API_KEY")
+REDIS_IP = os.getenv("REDIS_IP")
+
+redis_client = redis.Redis(host=REDIS_IP, port=6379, decode_responses=True)
 
 TOPIC_NAME = "rag1"
 kafka_connection_string = os.getenv("KAFKA_CONNECTION_STRING")
@@ -61,7 +67,18 @@ async def consume():
     try:
         async for msg in consumer:
             logger.info(f"Received message: {msg.value}, {len(msg.value)} bytes")
-            json_object = json.loads(msg.value.decode("utf-8"))
+            message = msg.value.decode("utf-8")
+
+            message_hash = hashlib.sha256(message.encode()).hexdigest()
+
+            exists = await redis_client.get(message_hash)
+            if exists:
+                print("Duplicate message detected, ignoring")
+                continue
+
+            await redis_client.set(message_hash, "1", ex=60)
+
+            json_object = json.loads(message)
             embed_text(json_object["text"], json_object["collection_name"])
     finally:
         await consumer.stop()

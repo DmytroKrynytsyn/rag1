@@ -15,6 +15,7 @@ openai = "^1.40.6"
 langchain = "^0.2.14"
 aiokafka = "^0.10.0"
 confluent-kafka = "^2.8.2"
+redis = {extras = ["asyncio"], version = "^5.0.1"}
 
 [tool.poetry.scripts]
 rag1backend = "rag1backend.entrypoint.main:main"
