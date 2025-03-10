@@ -3,6 +3,8 @@ import requests
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from dotenv import load_dotenv
+import pdfplumber
+from io import BytesIO
 
 from ..handlers.call_backend import search, embed
 from ..utils.slack import get_channel_name_by_id
@@ -12,12 +14,13 @@ load_dotenv()
 
 def get_attached_text(files: list, slack_app_token) -> str | None:
     if not files:
-        logger.info(f"No files attached")
+        logger.info("No files attached")
         return None
     
     file = files[0]
 
-    if file.get("filetype") != "text":
+    filetype = file.get("filetype")
+    if filetype not in ["text", "pdf"]:
         logger.info(f"File type {file.get('filetype')} not supported")
         return None
 
@@ -26,12 +29,28 @@ def get_attached_text(files: list, slack_app_token) -> str | None:
     headers = {"Authorization": f"Bearer {slack_app_token}"}
     response = requests.get(file_url, headers=headers)
     
-    if response.status_code == 200:
-        logger.info(f"File downloaded from {file_url}, length = {len(response.text)}")  
-        return response.text
-    else:
+    if response.status_code != 200:
+        logger.warning(f"Failed to download file from {file_url}, status code: {response.status_code}")
         return None
 
+    logger.info(f"File downloaded from {file_url}, length = {len(response.content)}")
+
+    if filetype == "text":
+        return response.text
+
+    if filetype == "pdf":
+        return extract_text_from_pdf(response.content)
+
+
+def extract_text_from_pdf(pdf_bytes):
+    """Extracts text from a PDF file (bytes) using pdfplumber."""
+    pdf_text = []
+    
+    with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
+        for page in pdf.pages:
+            pdf_text.append(page.extract_text() or "")  # Handle empty text pages
+
+    return "\n".join(pdf_text).strip()
 
 def main():
     
