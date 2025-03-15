@@ -1,12 +1,15 @@
 # LLM RAG - Milvus and Slack.
 
-![rag1 (1)](https://github.com/user-attachments/assets/258828ca-d904-4026-b7c2-ceb5482b93bb)
+![rag1_v2](https://github.com/user-attachments/assets/c8a91f8d-fddd-4bfc-8b19-93dd089524ee)
+
 
 
 ## Tech stack:
 1. Cloud - AWS, Docker, terrafrom/terragrunt
 2. Configuration: Ansible
 3. Software: Python, LangChain, FastAPI, Slack API
+4. Logs: EFK (Elasticsearch, FluentD, Kibana)
+5. Metrics: Telegraf Gateway, Prometheus, Grafana
 
 ## How to deploy / undeploy
 1. terragrunt apply -auto-approve  --terragrunt-working-dir ./terra
