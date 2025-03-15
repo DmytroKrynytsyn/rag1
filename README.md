@@ -5,18 +5,20 @@
 
 
 ## Tech stack:
-1. Cloud - AWS, Docker, terrafrom/terragrunt
+1. Cloud - AWS, Docker, terrafrom
 2. Configuration: Ansible
 3. Software: Python, LangChain, FastAPI, Slack API
 4. Logs: EFK (Elasticsearch, FluentD, Kibana)
 5. Metrics: Telegraf Gateway, Prometheus, Grafana
 
 ## How to deploy / undeploy
-1. terragrunt apply -auto-approve  --terragrunt-working-dir ./terra
-2. ansible-playbook -i ansible/dynamic_inventory.py ansible/playbook.yml
-3. Use it via slack
-4. ssh -i ../cks.pem ec2-user@$ip 'sudo systemctl stop vector-db-stop'
-5. terragrunt destroy -auto-approve --terragrunt-working-dir ./terra
+1. terraform -chdir=terraform init -upgrade
+2. terraform -chdir=terraform apply -auto-approve
+3. ansible-galaxy collection install dmytrokrynytsyn.components --force
+4. ansible-playbook -i ansible/dynamic_inventory.py ansible/playbook.yml
+5. Use it via slack
+6. ssh -i ../cks.pem ec2-user@$ip 'sudo systemctl stop vector-db-stop'
+7. terraform -chdir=terraform destroy -auto-approve
 
 
 
